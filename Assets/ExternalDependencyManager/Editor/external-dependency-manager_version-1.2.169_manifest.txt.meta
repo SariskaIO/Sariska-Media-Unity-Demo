@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9abf94ffb5a64c5bb8af390528f3b03e
+labels:
+- gvh
+- gvh_manifest
+- gvh_version-1.2.169
+- gvhp_exportpath-ExternalDependencyManager/Editor/external-dependency-manager_version-1.2.169_manifest.txt
+- gvhp_manifestname-0External Dependency Manager
+- gvhp_manifestname-play-services-resolver
+timeCreated: 1474401009
+licenseType: Pro
+TextScriptImporter:
+  userData:
+  assetBundleName:
+  assetBundleVariant:
