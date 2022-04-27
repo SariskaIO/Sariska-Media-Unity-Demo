@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="blob_provider_authority">io.sariskaunitymediaplugin.blob</string>
+    <string name="blob_provider_authority">io.sariskaunitymediaplugindemo.blob</string>
 </resources>

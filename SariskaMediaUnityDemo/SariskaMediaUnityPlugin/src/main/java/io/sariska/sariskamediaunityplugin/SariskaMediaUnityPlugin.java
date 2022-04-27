@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.YuvImage;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.core.app.ActivityCompat;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.common.ArrayUtils;
 import com.oney.WebRTCModule.WebRTCModule;
 import com.oney.WebRTCModule.WebRTCView;
 import org.webrtc.GlRectDrawer;
@@ -40,6 +42,8 @@ import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,6 +52,7 @@ import io.sariska.sdk.Conference;
 import io.sariska.sdk.JitsiLocalTrack;
 import io.sariska.sdk.JitsiRemoteTrack;
 import io.sariska.sdk.SariskaMediaTransport;
+import java.util.Arrays;
 
 public class SariskaMediaUnityPlugin{
     private static SariskaMediaUnityPlugin _instance;
@@ -138,7 +143,8 @@ public class SariskaMediaUnityPlugin{
                                 yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
                                 byte[] imageBytes = out.toByteArray();
                                 Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                                updateVideoStream(image, mTextureID);
+                                Bitmap rotatedImage = RotateBitmap(image, 180f);
+                                updateVideoStream(rotatedImage, mTextureID);
                             }
                         });
                     }
@@ -153,6 +159,13 @@ public class SariskaMediaUnityPlugin{
         connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
         });
         connection.connect();
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     private void createConference() {
@@ -193,7 +206,8 @@ public class SariskaMediaUnityPlugin{
                             yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
                             byte[] imageBytes = out.toByteArray();
                             Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                            updateVideoStream(image, mRemoteTextureId);
+                            Bitmap rotatedImage = RotateBitmap(image, 180f);
+                            updateVideoStream(rotatedImage, mRemoteTextureId);
                         }
                     });
 
@@ -214,6 +228,7 @@ public class SariskaMediaUnityPlugin{
         conference.join();
         System.out.println("We are past createConference");
     }
+
 
     private byte[] createNV21Data(VideoFrame.I420Buffer i420Buffer) {
         final int width = i420Buffer.getWidth();
@@ -355,6 +370,7 @@ public class SariskaMediaUnityPlugin{
         mRenderThread.execute(new Runnable() {
             @Override
             public void run() {
+
                 GLES20.glBindTexture(GL_TEXTURE_2D, textureId);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
