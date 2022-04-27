@@ -20,11 +20,17 @@ public class ExternalTextureSecond : MonoBehaviour
     private void Awake()
     {
         AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass("io.sariska.sariskamediaunityplugin.SariskaMediaUnityPlugin");
+
         AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+
         AndroidJavaObject currentActivityObject = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
+
         mGLTexCtrl = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
+
         //tokenInstance = TokenAPIHelp.GetSessionToken("dipak");
-        String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmYjc1MTJjZjgzYzdkYTRjMjM0Y2QzYWEyYWViOTUzMGNlZmUwMDg1YzRiZjljYzgwY2U5YmQ5YmRiNjA3ZjciLCJ0eXAiOiJKV1QifQ.eyJjb250ZXh0Ijp7InVzZXIiOnsiaWQiOiIwa3hwYmp6OSIsIm5hbWUiOiJVbml0eVVzZXIifSwiZ3JvdXAiOiIxIn0sInN1YiI6InVhdG5jb2U1djcybG5vaGxud2dxdjgiLCJyb29tIjoiKiIsImlhdCI6MTY1MDYzNTA2NSwibmJmIjoxNjUwNjM1MDY1LCJpc3MiOiJzYXJpc2thIiwiYXVkIjoibWVkaWFfbWVzc2FnaW5nX2NvLWJyb3dzaW5nIiwiZXhwIjoxNjUwODA3ODY1fQ.fuTQzwvIAaUAoq8zTrhMnunIUmJopct7g8vU08UHM7ScpwcR-umm602e4qJLtoNuptAMCfPPrj7It33yMHtkveCpmojxOy1ZUkpWLki-aZn0aE1y4ayktHfuig3CZCgzyXpBMX13lvG1PfQa0Z9wtOTYtM6vA7l4KuOHsdwgls-TcnqOgY4zi40HWp1d1OsdgddnmzdTxDmqJzqHIihmaCfR1h7bC8ywm2R6-6PKp2fYqPu1-xQKvuDvs7ETUyqMPDhuIQcVjBJIy3Uzlq2DGVfgglpl2BF3TimSKjctK1JwTvMkdXndBI60NBqtHc-JRstAszo_Hm4pzF06BtpErA";
+
+        string token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmYjc1MTJjZjgzYzdkYTRjMjM0Y2QzYWEyYWViOTUzMGNlZmUwMDg1YzRiZjljYzgwY2U5YmQ5YmRiNjA3ZjciLCJ0eXAiOiJKV1QifQ.eyJjb250ZXh0Ijp7InVzZXIiOnsiaWQiOiJlcXpheXhhNyIsIm5hbWUiOiJVbml0eVVzZXIifSwiZ3JvdXAiOiIxIn0sInN1YiI6InVhdG5jb2U1djcybG5vaGxud2dxdjgiLCJyb29tIjoiKiIsImlhdCI6MTY1MTA1ODY1OSwibmJmIjoxNjUxMDU4NjU5LCJpc3MiOiJzYXJpc2thIiwiYXVkIjoibWVkaWFfbWVzc2FnaW5nX2NvLWJyb3dzaW5nIiwiZXhwIjoxNjUxMjMxNDU5fQ.k0eJiQIEErJUaBR-PR_i6THHD_MS26-ndJkjC-sQ4GZwIfJP9EMHWd8bUu4nh5cG8r0qxODxZIuHMrQDXDXapkspfUnENol10MixpKGo4BAsvIxY61fstN0v-vUll29yq-4oJu3qvIlrFrEDRYIMvrXH36kSk71dkmUmGi8SHGEctFyIzBoXiXf5Adb9bJ_7SqoabR14PkLrOUPKKB_Jz7z_ZXMgPCIUrI3viJIshGaQ5zDb4-ZsZuyWG5g2StKBnZK0J3siKENe0W-OhSP0LtP56BNlJYtLXoTaI_pQzIzemyMZr4iFF6R6qPSMN4KgAA5p-GshaWsQ5m8teRoW1Q";
+
         mGLTexCtrl.Call("setupOpenGL", token);
     }
 
