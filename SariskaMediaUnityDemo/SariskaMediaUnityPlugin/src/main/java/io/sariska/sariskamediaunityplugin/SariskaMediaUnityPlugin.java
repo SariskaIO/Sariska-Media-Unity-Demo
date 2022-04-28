@@ -1,6 +1,11 @@
 package io.sariska.sariskamediaunityplugin;
 
+import static android.opengl.GLES20.GL_LUMINANCE;
+import static android.opengl.GLES20.GL_LUMINANCE_ALPHA;
+import static android.opengl.GLES20.GL_RGB;
+import static android.opengl.GLES20.GL_RGBA;
 import static android.opengl.GLES20.GL_TEXTURE_2D;
+import static android.opengl.GLES20.GL_UNSIGNED_BYTE;
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
 import android.app.Activity;
@@ -21,6 +26,7 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -41,6 +47,7 @@ import org.webrtc.VideoFrameDrawer;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
 import java.io.ByteArrayOutputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -138,13 +145,15 @@ public class SariskaMediaUnityPlugin{
                                 final int width = i420Buffer.getWidth();
                                 final int height = i420Buffer.getHeight();
                                 byte[] nv21Data = createNV21Data(i420Buffer);
-                                YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
-                                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                                yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
-                                byte[] imageBytes = out.toByteArray();
-                                Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                                Bitmap rotatedImage = RotateBitmap(image, 180f);
-                                updateVideoStream(rotatedImage, mTextureID);
+                                ByteBuffer bufferOfImage = ByteBuffer.wrap(nv21Data);
+//                                YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
+//                                ByteArrayOutputStream out = new ByteArrayOutputStream();
+//                                yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
+//                                byte[] imageBytes = out.toByteArray();
+
+//                                Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+//                                Bitmap rotatedImage = RotateBitmap(image, 180f);
+                                updateVideoStream(mTextureID, bufferOfImage, width, height);
                             }
                         });
                     }
@@ -201,16 +210,16 @@ public class SariskaMediaUnityPlugin{
                             final int width = i420Buffer.getWidth();
                             final int height = i420Buffer.getHeight();
                             byte[] nv21Data = createNV21Data(i420Buffer);
-                            YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
-                            byte[] imageBytes = out.toByteArray();
-                            Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                            Bitmap rotatedImage = RotateBitmap(image, 180f);
-                            updateVideoStream(rotatedImage, mRemoteTextureId);
+                            ByteBuffer bufferOfImage = ByteBuffer.wrap(nv21Data);
+//                            YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
+//                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//                            yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
+//                            byte[] imageBytes = out.toByteArray();
+//                            Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+//                            Bitmap rotatedImage = RotateBitmap(image, 180f);
+                            updateVideoStream(mRemoteTextureId, bufferOfImage, width, height);
                         }
                     });
-
                 }
             });
         });
@@ -366,11 +375,10 @@ public class SariskaMediaUnityPlugin{
         return this.mTextureHeight;
     }
 
-    public void updateVideoStream(Bitmap bitmap, int textureId){
+    public void updateVideoStream(int textureId, ByteBuffer buffer, int width, int height){
         mRenderThread.execute(new Runnable() {
             @Override
             public void run() {
-
                 GLES20.glBindTexture(GL_TEXTURE_2D, textureId);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
@@ -378,9 +386,13 @@ public class SariskaMediaUnityPlugin{
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+                Log.d("Dipak", "We are about to renderImage");
+                //GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
+                GlUtil.checkNoGLES2Error("EglRenderer.notifyCallbacks");
+                Log.d("Dipak", "Rendered image" + num);
                 GLES20.glBindTexture(GL_TEXTURE_2D, 0);
-                bitmap.recycle();// Reclaim memory
+                //bitmap.recycle();// Reclaim memory
                 num++;
             }
         });
