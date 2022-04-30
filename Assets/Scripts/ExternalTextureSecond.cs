@@ -15,17 +15,20 @@ public class ExternalTextureSecond : MonoBehaviour
     private Texture2D texture2D;
     private Texture2D remoteTexture2D;
     private IntPtr _nativeTexturePointer;
-    //private Token tokenInstance;
-    
+    private Token tokenInstance;
+
     private void Awake()
     {
+        
         AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass("io.sariska.sariskamediaunityplugin.SariskaMediaUnityPlugin");
         AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivityObject = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
         mGLTexCtrl = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
         //tokenInstance = TokenAPIHelp.GetSessionToken("dipak");
-        String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmYjc1MTJjZjgzYzdkYTRjMjM0Y2QzYWEyYWViOTUzMGNlZmUwMDg1YzRiZjljYzgwY2U5YmQ5YmRiNjA3ZjciLCJ0eXAiOiJKV1QifQ.eyJjb250ZXh0Ijp7InVzZXIiOnsiaWQiOiIwa3hwYmp6OSIsIm5hbWUiOiJVbml0eVVzZXIifSwiZ3JvdXAiOiIxIn0sInN1YiI6InVhdG5jb2U1djcybG5vaGxud2dxdjgiLCJyb29tIjoiKiIsImlhdCI6MTY1MDYzNTA2NSwibmJmIjoxNjUwNjM1MDY1LCJpc3MiOiJzYXJpc2thIiwiYXVkIjoibWVkaWFfbWVzc2FnaW5nX2NvLWJyb3dzaW5nIiwiZXhwIjoxNjUwODA3ODY1fQ.fuTQzwvIAaUAoq8zTrhMnunIUmJopct7g8vU08UHM7ScpwcR-umm602e4qJLtoNuptAMCfPPrj7It33yMHtkveCpmojxOy1ZUkpWLki-aZn0aE1y4ayktHfuig3CZCgzyXpBMX13lvG1PfQa0Z9wtOTYtM6vA7l4KuOHsdwgls-TcnqOgY4zi40HWp1d1OsdgddnmzdTxDmqJzqHIihmaCfR1h7bC8ywm2R6-6PKp2fYqPu1-xQKvuDvs7ETUyqMPDhuIQcVjBJIy3Uzlq2DGVfgglpl2BF3TimSKjctK1JwTvMkdXndBI60NBqtHc-JRstAszo_Hm4pzF06BtpErA";
-        mGLTexCtrl.Call("setupOpenGL", token);
+        var roomName = SwitchScene.InputRoomName;
+        Debug.Log("Texture ID value is zero");
+        tokenInstance = TokenAPIHelp.GetSessionToken(roomName);
+        mGLTexCtrl.Call("setupOpenGL", tokenInstance.token, roomName);
     }
 
     // Start is called before the first frame update

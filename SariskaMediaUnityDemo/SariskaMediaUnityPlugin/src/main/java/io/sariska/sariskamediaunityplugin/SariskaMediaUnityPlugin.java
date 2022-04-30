@@ -8,8 +8,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
-import android.graphics.SurfaceTexture;
 import android.graphics.YuvImage;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
@@ -60,6 +60,7 @@ public class SariskaMediaUnityPlugin{
     private int mTextureWidth;
     private int mTextureHeight;
     private String token;
+    private String roomName;
     int num = 0;
     private List<JitsiLocalTrack> localTracks;
     private VideoTrack localVideoTrack;
@@ -138,7 +139,8 @@ public class SariskaMediaUnityPlugin{
                                 yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
                                 byte[] imageBytes = out.toByteArray();
                                 Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                                updateVideoStream(image, mTextureID);
+                                Bitmap rotatedImage = RotateBitmap(image, 180f);
+                                updateVideoStream(rotatedImage, mTextureID);
                             }
                         });
                     }
@@ -146,13 +148,20 @@ public class SariskaMediaUnityPlugin{
             });
         });
 
-        connection = SariskaMediaTransport.JitsiConnection(token, "dipak", false);
+        connection = SariskaMediaTransport.JitsiConnection(token, roomName, false);
         connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
         connection.addEventListener("CONNECTION_FAILED", () -> {
         });
         connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
         });
         connection.connect();
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     private void createConference() {
@@ -193,7 +202,8 @@ public class SariskaMediaUnityPlugin{
                             yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
                             byte[] imageBytes = out.toByteArray();
                             Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                            updateVideoStream(image, mRemoteTextureId);
+                            Bitmap rotatedImage = RotateBitmap(image, 180f);
+                            updateVideoStream(rotatedImage, mRemoteTextureId);
                         }
                     });
 
@@ -243,10 +253,11 @@ public class SariskaMediaUnityPlugin{
         return nv21Data;
     }
 
-    public void setupOpenGL(String tokenFromUnity)
+    public void setupOpenGL(String tokenFromUnity, String roomName)
     {
         Log.d(TAG, "setupOpenGL called by Unity ");
         this.token = tokenFromUnity;
+        this.roomName = roomName;
         //Get eglcontext and egldisplay of the unity thread
         mSharedEglContext = EGL14.eglGetCurrentContext();
         if (mSharedEglContext == EGL14.EGL_NO_CONTEXT) {
