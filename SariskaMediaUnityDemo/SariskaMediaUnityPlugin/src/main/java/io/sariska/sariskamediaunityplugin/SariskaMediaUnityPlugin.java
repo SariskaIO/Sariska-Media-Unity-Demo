@@ -381,4 +381,27 @@ public class SariskaMediaUnityPlugin{
         });
     }
 
+    public void onMuteAudio(){
+        localTracks.get(0).mute();
+    }
+
+    public void onUnMuteAudio(){
+        localTracks.get(0).unmute();
+    }
+
+    public void onMuteVideo(){
+        localTracks.get(1).mute();
+    }
+
+    public void onUnMuteVideo(){
+        localTracks.get(1).unmute();
+    }
+
+    public void onEndCall(){
+        if(conference != null){
+            conference.leave();
+        }
+        connection.disconnect();
+        mUnityActivity.finish();
+    }
 }

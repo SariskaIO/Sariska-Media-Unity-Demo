@@ -16,6 +16,13 @@ public class ExternalTextureSecond : MonoBehaviour
     private Texture2D remoteTexture2D;
     private IntPtr _nativeTexturePointer;
     private Token tokenInstance;
+    private int tapAudio;
+    private int tapVideo;
+    //Buttons
+
+    private Button MuteButton;
+    private Button MuteVideoButton;
+    private Button EndCallButton;
 
     private void Awake()
     {
@@ -44,6 +51,46 @@ public class ExternalTextureSecond : MonoBehaviour
         texture2D = new Texture2D(1280, 800, TextureFormat.ARGB32, false);
         image.texture = texture2D;
         BindTexture(_nativeTexturePointer);
+
+        //Adding Onclick listeners for the buttons
+
+        MuteButton.onClick.AddListener(MuteUnMuteAudio);
+        MuteVideoButton.onClick.AddListener(MuteVideo);
+        EndCallButton.onClick.AddListener(EndCall);
+    }
+
+    public void MuteUnMuteAudio()
+    {
+        
+        if(tapAudio%2 == 0)
+        {
+            mGLTexCtrl.Call("onMuteAudio");
+            tapAudio++;
+        }
+        else
+        {
+            mGLTexCtrl.Call("onUnMuteAudio");
+            tapAudio++;
+        }
+    }
+
+    public void MuteVideo()
+    {
+        if (tapVideo % 2 == 0)
+        {
+            mGLTexCtrl.Call("onMuteVideo");
+            tapVideo++;
+        }
+        else
+        {
+            mGLTexCtrl.Call("onUnMuteVideo");
+            tapVideo++;
+        }
+    }
+
+    public void EndCall()
+    {
+        mGLTexCtrl.Call("onEndCall");
     }
 
     private void BindTexture(IntPtr remoteTexturePointer)
