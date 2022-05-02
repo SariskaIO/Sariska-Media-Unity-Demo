@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "RZ8N90NGFZM",
         "name": "io.sariska.unitydemo",
-        "processId": 15066,
+        "processId": 24495,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -66,6 +66,12 @@
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
             "processId": 15066,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 24495,
             "exited": false
         }
     ],
