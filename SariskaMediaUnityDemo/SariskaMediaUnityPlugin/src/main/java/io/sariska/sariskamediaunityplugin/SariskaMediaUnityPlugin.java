@@ -203,10 +203,9 @@ public class SariskaMediaUnityPlugin{
                             byte[] imageBytes = out.toByteArray();
                             Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
                             Bitmap rotatedImage = RotateBitmap(image, 180f);
-                            updateVideoStream(rotatedImage, mRemoteTextureId);
+                            updateRemoteVideoStream(rotatedImage, mRemoteTextureId);
                         }
                     });
-
                 }
             });
         });
@@ -360,6 +359,25 @@ public class SariskaMediaUnityPlugin{
 
     public int getStreamTextureHeight(){
         return this.mTextureHeight;
+    }
+
+    public void updateRemoteVideoStream(Bitmap bitmap, int mTextureID){
+        mRenderThread.execute(new Runnable() {
+            @Override
+            public void run() {
+                GLES20.glBindTexture(GL_TEXTURE_2D, mTextureID);
+                GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+                GLES20.glBindTexture(GL_TEXTURE_2D, 0);
+                bitmap.recycle();// Reclaim memory
+                num++;
+            }
+        });
     }
 
     public void updateVideoStream(Bitmap bitmap, int textureId){

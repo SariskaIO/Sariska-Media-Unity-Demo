@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "RZ8N90NGFZM",
         "name": "io.sariska.unitydemo",
-        "processId": 24495,
+        "processId": 17899,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -17,61 +17,43 @@
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 4833,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 7021,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 4840,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 7331,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 8830,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 9029,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
             "processId": 11703,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
             "processId": 12265,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
             "processId": 15066,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
             "processId": 24495,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 17259,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 17485,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 17899,
             "exited": false
         }
     ],
