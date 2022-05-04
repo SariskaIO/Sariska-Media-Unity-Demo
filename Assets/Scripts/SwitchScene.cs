@@ -31,10 +31,13 @@ public class SwitchScene : MonoBehaviour
         //Retrive text from input fields
         InputRoomName = inputFieldRoomNameGameObject.GetComponent<InputField>().text;
         InputUserName = inputFieldUsernameGameObject.GetComponent<InputField>().text;
-
-
-        Debug.Log("Name of the room is" + InputRoomName);
-        Debug.Log("Name of the user is" + InputUserName);
+        if(InputRoomName == "")
+        {
+            return;
+        }else if (InputUserName == "")
+        {
+            return;
+        }
 
         //load the video scene
         SceneManager.LoadScene(sceneName: "MediaUnityScene");

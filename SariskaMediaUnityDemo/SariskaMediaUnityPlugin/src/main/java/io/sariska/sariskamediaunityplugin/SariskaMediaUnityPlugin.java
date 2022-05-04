@@ -20,19 +20,12 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import androidx.core.app.ActivityCompat;
-import com.facebook.react.bridge.ReactContext;
-import com.oney.WebRTCModule.WebRTCModule;
 import com.oney.WebRTCModule.WebRTCView;
 import org.webrtc.GlRectDrawer;
 import org.webrtc.GlTextureFrameBuffer;
 import org.webrtc.GlUtil;
-import org.webrtc.MediaStream;
-import org.webrtc.MediaStreamTrack;
 import org.webrtc.RendererCommon;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoFrameDrawer;
@@ -294,8 +287,8 @@ public class SariskaMediaUnityPlugin{
                     Log.d(TAG, "No Textures present");
                 }
                 mTextureID = textures[0];
-                mTextureWidth = 1280;
-                mTextureHeight = 800;
+                mTextureWidth = 480;
+                mTextureHeight = 640;
             }
         });
     }
@@ -348,9 +341,9 @@ public class SariskaMediaUnityPlugin{
     }
 
     public int getStreamTextureID(int remoteTextureId){
-        Log.d(TAG, "Returning Texture ID" + mTextureID);
+
         this.mRemoteTextureId = remoteTextureId;
-        return this.mTextureID;
+        return mTextureID;
     }
 
     public int getStreamTextureWidth(){
@@ -361,11 +354,11 @@ public class SariskaMediaUnityPlugin{
         return this.mTextureHeight;
     }
 
-    public void updateRemoteVideoStream(Bitmap bitmap, int mTextureID){
+    public void updateRemoteVideoStream(Bitmap bitmap, int mTextureIDLocal){
         mRenderThread.execute(new Runnable() {
             @Override
             public void run() {
-                GLES20.glBindTexture(GL_TEXTURE_2D, mTextureID);
+                GLES20.glBindTexture(GL_TEXTURE_2D, mTextureIDLocal);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
@@ -375,16 +368,15 @@ public class SariskaMediaUnityPlugin{
                 GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
                 GLES20.glBindTexture(GL_TEXTURE_2D, 0);
                 bitmap.recycle();// Reclaim memory
-                num++;
             }
         });
     }
 
-    public void updateVideoStream(Bitmap bitmap, int textureId){
+    public void updateVideoStream(Bitmap bitmap, int textureIdLocal){
         mRenderThread.execute(new Runnable() {
             @Override
             public void run() {
-                GLES20.glBindTexture(GL_TEXTURE_2D, textureId);
+                GLES20.glBindTexture(GL_TEXTURE_2D, textureIdLocal);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
                 GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
@@ -394,7 +386,6 @@ public class SariskaMediaUnityPlugin{
                 GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
                 GLES20.glBindTexture(GL_TEXTURE_2D, 0);
                 bitmap.recycle();// Reclaim memory
-                num++;
             }
         });
     }
@@ -413,6 +404,21 @@ public class SariskaMediaUnityPlugin{
 
     public void onUnMuteVideo(){
         localTracks.get(1).unmute();
+    }
+
+    public void onSwitchCamera(){
+        localTracks.get(1).switchCamera();
+    }
+
+    public void onSpeakerChanges(){
+        //need to do
+    }
+
+    public void onLogout(){
+        if(conference != null){
+            conference.leave();
+        }
+        connection.disconnect();
     }
 
     public void onEndCall(){

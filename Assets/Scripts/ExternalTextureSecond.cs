@@ -2,13 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ExternalTextureSecond : MonoBehaviour
 {
     private AndroidJavaObject mGLTexCtrl;
-    [SerializeField] private RawImage image;
+
+    [SerializeField] private RawImage localImage;
     [SerializeField] private RawImage remoteImage;
+
     private int mTextureId;
     private int mWidth;
     private int mHeight;
@@ -31,9 +34,10 @@ public class ExternalTextureSecond : MonoBehaviour
         AndroidJavaObject currentActivityObject = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
         mGLTexCtrl = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
         //tokenInstance = TokenAPIHelp.GetSessionToken("dipak");
+
         var roomName = SwitchScene.InputRoomName;
         var userName = SwitchScene.InputUserName;
-        Debug.Log("Texture ID value is zero");
+
         tokenInstance = TokenAPIHelp.GetSessionToken(roomName, userName);
         mGLTexCtrl.Call("setupOpenGL", tokenInstance.token, roomName);
     }
@@ -43,26 +47,51 @@ public class ExternalTextureSecond : MonoBehaviour
     {
         remoteTexture2D = new Texture2D(1280, 800, TextureFormat.ARGB32, false)
         { filterMode = FilterMode.Point };
-
         remoteTexture2D.Apply();
         remoteImage.texture = remoteTexture2D;
         _nativeTexturePointer = remoteTexture2D.GetNativeTexturePtr();
 
-        texture2D = new Texture2D(1280, 800, TextureFormat.ARGB32, false);
-        image.texture = texture2D;
+       
+
+        texture2D = new Texture2D(480, 640, TextureFormat.ARGB32, false);
+        localImage.texture = texture2D;
         BindTexture(_nativeTexturePointer);
 
         //Adding Onclick listeners for the buttons
-
         MuteButton.onClick.AddListener(MuteUnMuteAudio);
         MuteVideoButton.onClick.AddListener(MuteVideo);
         EndCallButton.onClick.AddListener(EndCall);
     }
 
+    private void BindTexture(IntPtr remoteTexturePointer)
+    {
+        mTextureId= mGLTexCtrl.Call<int>("getStreamTextureID",
+                remoteTexturePointer.ToInt32());
+
+        if (mTextureId == 0)
+        {
+            Debug.Log("Texture ID value is zero");
+        }
+        mWidth = mGLTexCtrl.Call<int>("getStreamTextureWidth");
+        mHeight = mGLTexCtrl.Call<int>("getStreamTextureHeight");
+        Debug.Log("Done getting width and height");
+
+        Texture2D nativeTexture = Texture2D.CreateExternalTexture(
+                mWidth, mHeight,
+                TextureFormat.ARGB32,
+                false, false,
+                (IntPtr)mTextureId);
+
+        texture2D.UpdateExternalTexture(nativeTexture.GetNativeTexturePtr());
+        //Update texture data
+
+        mGLTexCtrl.Call("setupLocalStream");
+    }
+
     public void MuteUnMuteAudio()
     {
-        
-        if(tapAudio%2 == 0)
+
+        if (tapAudio % 2 == 0)
         {
             mGLTexCtrl.Call("onMuteAudio");
             tapAudio++;
@@ -88,40 +117,24 @@ public class ExternalTextureSecond : MonoBehaviour
         }
     }
 
+    public void switchCamera()
+    {
+        mGLTexCtrl.Call("onSwitchCamera");
+    }
+
+    public void onSpeaker()
+    {
+        mGLTexCtrl.Call("onSpeakerChanges");
+    }
+
     public void EndCall()
     {
         mGLTexCtrl.Call("onEndCall");
     }
 
-    private void BindTexture(IntPtr remoteTexturePointer)
+    public void LogOut()
     {
-        mTextureId = mGLTexCtrl.Call<int>("getStreamTextureID", remoteTexturePointer.ToInt32());
-        if (mTextureId == 0) {
-            Debug.Log("Texture ID value is zero");
-        }
-        mWidth = mGLTexCtrl.Call<int>("getStreamTextureWidth");
-        mHeight = mGLTexCtrl.Call<int>("getStreamTextureHeight");
-        Debug.Log("Done getting width and height");
-        
-        Texture2D nativeTexture = Texture2D.CreateExternalTexture(
-                mWidth, mHeight,
-                TextureFormat.ARGB32,
-                false, false,
-                (IntPtr)mTextureId);
-
-        texture2D.UpdateExternalTexture(nativeTexture.GetNativeTexturePtr());
-        //Update texture data
-        
-        mGLTexCtrl.Call("setupLocalStream");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if(mGLTexCtrl == null)
-        {
-            return;
-        }
-        
+        mGLTexCtrl.Call("onLogout");
+        SceneManager.LoadScene(sceneName: "LandingPage");
     }
 }
