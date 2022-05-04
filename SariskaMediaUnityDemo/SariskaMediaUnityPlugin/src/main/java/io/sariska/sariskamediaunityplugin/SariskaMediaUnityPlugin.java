@@ -23,12 +23,7 @@ import android.os.Bundle;
 import android.util.Log;
 import androidx.core.app.ActivityCompat;
 import com.oney.WebRTCModule.WebRTCView;
-import org.webrtc.GlRectDrawer;
-import org.webrtc.GlTextureFrameBuffer;
-import org.webrtc.GlUtil;
-import org.webrtc.RendererCommon;
 import org.webrtc.VideoFrame;
-import org.webrtc.VideoFrameDrawer;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
 import java.io.ByteArrayOutputStream;
@@ -54,14 +49,12 @@ public class SariskaMediaUnityPlugin{
     private int mTextureHeight;
     private String token;
     private String roomName;
-    int num = 0;
     private List<JitsiLocalTrack> localTracks;
     private VideoTrack localVideoTrack;
     private VideoTrack remoteVideoTrack;
-    private VideoFrameDrawer videoFrameDrawer = new VideoFrameDrawer();
-    private RendererCommon.GlDrawer drawer = new GlRectDrawer();
-    private final GlTextureFrameBuffer bitmapTextureFramebuffer;
     private Connection connection;
+    private Conference conference;
+
 
     //It is called by unity to obtain eglcontext, which is executed in the unity thread
     private static final String TAG = "JavaPlugin";
@@ -73,9 +66,8 @@ public class SariskaMediaUnityPlugin{
             android.Manifest.permission.CAMERA,
             android.Manifest.permission.RECORD_AUDIO
     };
-    int PERMISSION_ALL = 1;
-    private Conference conference;
 
+    int PERMISSION_ALL = 1;
 
     public static SariskaMediaUnityPlugin Instance(Activity context) {
         if (_instance == null) {
@@ -85,7 +77,6 @@ public class SariskaMediaUnityPlugin{
     }
 
     private SariskaMediaUnityPlugin(Activity unityActivity){
-        this.bitmapTextureFramebuffer = new GlTextureFrameBuffer(GLES20.GL_RGBA);
         SariskaMediaTransport.initializeSdk(unityActivity.getApplication());
         if (!hasPermissions(unityActivity, PERMISSIONS)) {
             ActivityCompat.requestPermissions(unityActivity, PERMISSIONS, PERMISSION_ALL);
@@ -158,7 +149,6 @@ public class SariskaMediaUnityPlugin{
     }
 
     private void createConference() {
-        System.out.println("We are in createConference");
         conference = connection.initJitsiConference();
 
         conference.addEventListener("CONFERENCE_JOINED", () -> {
@@ -202,6 +192,7 @@ public class SariskaMediaUnityPlugin{
                 }
             });
         });
+
         conference.addEventListener("TRACK_REMOVED", p -> {
             JitsiRemoteTrack track = (JitsiRemoteTrack) p;
             runOnUiThread(() -> {
@@ -213,8 +204,9 @@ public class SariskaMediaUnityPlugin{
                 });
             });
         });
+
         conference.join();
-        System.out.println("We are past createConference");
+
     }
 
     private byte[] createNV21Data(VideoFrame.I420Buffer i420Buffer) {
@@ -226,7 +218,8 @@ public class SariskaMediaUnityPlugin{
         final int ySize = width * height;
         final ByteBuffer nv21Buffer = ByteBuffer.allocateDirect(ySize + chromaStride * chromaHeight);
         // We don't care what the array offset is since we only want an array that is direct.
-        @SuppressWarnings("ByteBufferBackingArray") final byte[] nv21Data = nv21Buffer.array();
+        @SuppressWarnings("ByteBufferBackingArray")
+        final byte[] nv21Data = nv21Buffer.array();
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 final byte yValue = i420Buffer.getDataY().get(y * i420Buffer.getStrideY() + x);
@@ -247,7 +240,6 @@ public class SariskaMediaUnityPlugin{
 
     public void setupOpenGL(String tokenFromUnity, String roomName)
     {
-        Log.d(TAG, "setupOpenGL called by Unity ");
         this.token = tokenFromUnity;
         this.roomName = roomName;
         //Get eglcontext and egldisplay of the unity thread
@@ -341,7 +333,6 @@ public class SariskaMediaUnityPlugin{
     }
 
     public int getStreamTextureID(int remoteTextureId){
-
         this.mRemoteTextureId = remoteTextureId;
         return mTextureID;
     }
@@ -413,6 +404,7 @@ public class SariskaMediaUnityPlugin{
     public void onSpeakerChanges(){
         //need to do
     }
+
 
     public void onLogout(){
         if(conference != null){

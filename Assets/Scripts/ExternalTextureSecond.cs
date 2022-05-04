@@ -137,4 +137,17 @@ public class ExternalTextureSecond : MonoBehaviour
         mGLTexCtrl.Call("onLogout");
         SceneManager.LoadScene(sceneName: "LandingPage");
     }
+
+    public void Update()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // Check if Back was pressed this frame
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                // Quit the application
+                mGLTexCtrl.Call("onEndCall");
+            }
+        }
+    }
 }
