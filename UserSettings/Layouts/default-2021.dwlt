@@ -15,7 +15,7 @@ MonoBehaviour:
   m_PixelRect:
     serializedVersion: 2
     x: 0
-    y: 54
+    y: 53
     width: 1440
     height: 797
   m_ShowMode: 4
@@ -297,7 +297,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 526.5
+    y: 525.5
     width: 1098.5
     height: 283.5
   m_ViewDataDictionary: {fileID: 0}
@@ -317,22 +317,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scenes
+    - Assets/Plugins/Android
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scenes
+  - Assets/Plugins/Android
   m_LastFoldersGridSize: -1
   m_LastProjectPath: /Users/dipaksisodiya/Desktop/Development/Demos/Sariska-Media-Unity-Demo
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 8e5f0000
-    m_LastClickedID: 24462
-    m_ExpandedIDs: 00000000765f00002c7300008a750000168200003683000000ca9a3bffffff7f
+    m_SelectedIDs: 0c600000
+    m_LastClickedID: 24588
+    m_ExpandedIDs: 00000000a05f0000a25f0000a45f0000a65f0000ca5f000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -360,7 +360,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000765f0000
+    m_ExpandedIDs: 00000000a05f0000a25f0000a45f0000a65f0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -437,7 +437,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 1099.5
-    y: 84
+    y: 83
     width: 339.5
     height: 726
   m_ViewDataDictionary: {fileID: 0}
@@ -478,7 +478,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 84
+    y: 83
     width: 269.5
     height: 421.5
   m_ViewDataDictionary: {fileID: 0}
@@ -490,7 +490,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 6aaeffffc6b1ffff20b2ffffb8b3ffff4ab4ffff7eb4ffff98b4ffff9cb4ffff2ab6ffff5eb6ffff78b6ffff7cb6ffffb0b8ffffe6b8ffff48baffff4cbaffff78c2ffff46c4ffffa4f2ffff28fbffff365f0000405f00008a690000606b0000a2890000988a0000c68a0000068b0000cc8c0000f08c0000
+      m_ExpandedIDs: 1ef8ffff52f8ffffb4f9ffffb8f9ffff28fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -862,7 +862,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 270.5
-    y: 84
+    y: 83
     width: 827
     height: 421.5
   m_ViewDataDictionary: {fileID: 0}

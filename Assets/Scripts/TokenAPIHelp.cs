@@ -7,11 +7,11 @@ using System.Text;
 
 public static class TokenAPIHelp
 {
-   public static Token GetSessionToken(string RoomName)
+   public static Token GetSessionToken(string RoomName, string UserName)
     {
 		HttpWebRequest request;
 		string data = "{\"sessionId\":\"" + RoomName + "\"," +
-			"\"apiKey\":\"27fd6f8080d512442a3694f461adb3986cda5ba39dbe368d75\",\"user\":{\"name\":\"UnityUser\",\"moderator\": false}}";
+			"\"apiKey\":\"27fd6f8080d512442a3694f461adb3986cda5ba39dbe368d75\",\"user\":{\"name\":\""+ UserName+"\",\"moderator\": false}}";
 		byte[] dataBytes = Encoding.UTF8.GetBytes(data);
 		Debug.Log("Creating request");
 		request = (HttpWebRequest)(WebRequest.Create("https://api.sariska.io/api/v1/misc/generate-token"));

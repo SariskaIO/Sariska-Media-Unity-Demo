@@ -7,21 +7,36 @@ using UnityEngine.UI;
 
 public class SwitchScene : MonoBehaviour
 {
+    //Declare string var (static) for room name and user name
     public static string InputRoomName;
+    public static string InputUserName;
+
+    //Button to move to the next scene
     Button button;
-    string something;
-    GameObject inputFieldGameObject;
+
+    GameObject inputFieldRoomNameGameObject;
+    GameObject inputFieldUsernameGameObject;
     public void Start()
     {
-        inputFieldGameObject = GameObject.Find("InputField");
+        //Identify game object based on their names
+        inputFieldRoomNameGameObject = GameObject.Find("InputField");
+        inputFieldUsernameGameObject = GameObject.Find("InputFieldUsername");
+
+        //Add click listener for the start meeting button
         button.onClick.AddListener(TaskOnClick);
     }
 
     public void TaskOnClick()
     {
-        string name = inputFieldGameObject.GetComponent<InputField>().text;
-        InputRoomName = name;
-        Debug.Log("Name of the room is" + name);
+        //Retrive text from input fields
+        InputRoomName = inputFieldRoomNameGameObject.GetComponent<InputField>().text;
+        InputUserName = inputFieldUsernameGameObject.GetComponent<InputField>().text;
+
+
+        Debug.Log("Name of the room is" + InputRoomName);
+        Debug.Log("Name of the user is" + InputUserName);
+
+        //load the video scene
         SceneManager.LoadScene(sceneName: "MediaUnityScene");
     }
    

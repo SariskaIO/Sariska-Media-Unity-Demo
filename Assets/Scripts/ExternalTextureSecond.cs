@@ -26,15 +26,15 @@ public class ExternalTextureSecond : MonoBehaviour
 
     private void Awake()
     {
-        
         AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass("io.sariska.sariskamediaunityplugin.SariskaMediaUnityPlugin");
         AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivityObject = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
         mGLTexCtrl = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
         //tokenInstance = TokenAPIHelp.GetSessionToken("dipak");
         var roomName = SwitchScene.InputRoomName;
+        var userName = SwitchScene.InputUserName;
         Debug.Log("Texture ID value is zero");
-        tokenInstance = TokenAPIHelp.GetSessionToken(roomName);
+        tokenInstance = TokenAPIHelp.GetSessionToken(roomName, userName);
         mGLTexCtrl.Call("setupOpenGL", tokenInstance.token, roomName);
     }
 
