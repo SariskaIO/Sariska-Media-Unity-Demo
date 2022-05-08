@@ -1,9 +1,9 @@
 {
     "m_SelectedDeviceId": "RZ8N90NGFZM",
     "m_SelectedPackage": {
-        "deviceId": "",
-        "name": "",
-        "processId": 0,
+        "deviceId": "RZ8N90NGFZM",
+        "name": "io.sariska.unitydemo",
+        "processId": 17532,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -43,6 +43,24 @@
             "name": "io.sariska.unitydemo",
             "processId": 32445,
             "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 28826,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 771,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 17532,
+            "exited": false
         }
     ],
     "m_Tags": {
