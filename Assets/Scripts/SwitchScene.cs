@@ -22,8 +22,6 @@ public class SwitchScene : MonoBehaviour
         inputFieldRoomNameGameObject = GameObject.Find("InputField");
         inputFieldUsernameGameObject = GameObject.Find("InputFieldUsername");
 
-        //Add click listener for the start meeting button
-        button.onClick.AddListener(TaskOnClick);
     }
 
     public void TaskOnClick()
