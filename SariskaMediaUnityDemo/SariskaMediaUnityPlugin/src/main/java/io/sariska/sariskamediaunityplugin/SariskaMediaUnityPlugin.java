@@ -122,9 +122,15 @@ public class SariskaMediaUnityPlugin{
                                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                                 yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
                                 byte[] imageBytes = out.toByteArray();
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inPurgeable = true;
+                                options.inInputShareable = true;
                                 Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                                Bitmap rotatedImage = RotateBitmap(image, 180f);
-                                updateVideoStream(rotatedImage, mTextureID);
+                                //Bitmap rotatedImage = RotateBitmap(image, 180f);
+                                updateVideoStream(image, mTextureID);
+                                i420Buffer.release();
+                                System.gc();
+                                Runtime.getRuntime().gc();
                             }
                         });
                     }
@@ -180,13 +186,20 @@ public class SariskaMediaUnityPlugin{
                             final int width = i420Buffer.getWidth();
                             final int height = i420Buffer.getHeight();
                             byte[] nv21Data = createNV21Data(i420Buffer);
+                            i420Buffer.release();
                             YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
                             ByteArrayOutputStream out = new ByteArrayOutputStream();
                             yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
                             byte[] imageBytes = out.toByteArray();
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inPurgeable = true;
+                            options.inInputShareable = true;
                             Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                            Bitmap rotatedImage = RotateBitmap(image, 180f);
-                            updateRemoteVideoStream(rotatedImage, mRemoteTextureId);
+                            //Bitmap rotatedImage = RotateBitmap(image, 180f);
+                            updateRemoteVideoStream(image, mRemoteTextureId);
+
+                            System.gc();
+                            Runtime.getRuntime().gc();
                         }
                     });
                 }
@@ -235,6 +248,7 @@ public class SariskaMediaUnityPlugin{
                 nv21Data[ySize + y * chromaStride + 2 * x + 1] = uValue;
             }
         }
+
         return nv21Data;
     }
 
