@@ -40,7 +40,8 @@ import io.sariska.sdk.SariskaMediaTransport;
 public class SariskaMediaUnityPlugin{
     private static SariskaMediaUnityPlugin _instance;
     private Activity mUnityActivity;
-    private final ExecutorService mRenderThread = Executors.newSingleThreadExecutor();
+    private final ExecutorService mRenderThreadLocal = Executors.newSingleThreadExecutor();
+    private final ExecutorService mRenderThreadRemote = Executors.newFixedThreadPool(2);
     private volatile EGLContext mSharedEglContext;
     private volatile EGLConfig mSharedEglConfig;
     private int mTextureID;
@@ -173,9 +174,16 @@ public class SariskaMediaUnityPlugin{
             runOnUiThread(() -> {
                 if(track.getStreamURL().equals(localTracks.get(1).getStreamURL())){
                     //So as to not add local track in remote container
+
                     return;
                 }
                 if (track.getType().equals("video")) {
+                    mRenderThreadRemote.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            GLES20.glBindTexture(GL_TEXTURE_2D, 0);
+                        }
+                    });
                     WebRTCView view = track.render();
                     view.setMirror(true);
                     remoteVideoTrack = view.getVideoTrackForStreamURL(track.getStreamURL());
@@ -197,7 +205,6 @@ public class SariskaMediaUnityPlugin{
                             Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
                             //Bitmap rotatedImage = RotateBitmap(image, 180f);
                             updateRemoteVideoStream(image, mRemoteTextureId);
-
                             System.gc();
                             Runtime.getRuntime().gc();
                         }
@@ -277,7 +284,7 @@ public class SariskaMediaUnityPlugin{
         }
 
         mSharedEglConfig = eglConfigs[0];
-        mRenderThread.execute(new Runnable() {
+        mRenderThreadLocal.execute(new Runnable() {
             @Override
             public void run() {
                 //Java thread initializes OpenGL environment
@@ -295,6 +302,17 @@ public class SariskaMediaUnityPlugin{
                 mTextureID = textures[0];
                 mTextureWidth = 480;
                 mTextureHeight = 640;
+            }
+        });
+
+        mRenderThreadRemote.execute(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    initOpenGL();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -360,7 +378,7 @@ public class SariskaMediaUnityPlugin{
     }
 
     public void updateRemoteVideoStream(Bitmap bitmap, int mTextureIDLocal){
-        mRenderThread.execute(new Runnable() {
+        mRenderThreadRemote.execute(new Runnable() {
             @Override
             public void run() {
                 GLES20.glBindTexture(GL_TEXTURE_2D, mTextureIDLocal);
@@ -378,7 +396,7 @@ public class SariskaMediaUnityPlugin{
     }
 
     public void updateVideoStream(Bitmap bitmap, int textureIdLocal){
-        mRenderThread.execute(new Runnable() {
+        mRenderThreadLocal.execute(new Runnable() {
             @Override
             public void run() {
                 GLES20.glBindTexture(GL_TEXTURE_2D, textureIdLocal);
