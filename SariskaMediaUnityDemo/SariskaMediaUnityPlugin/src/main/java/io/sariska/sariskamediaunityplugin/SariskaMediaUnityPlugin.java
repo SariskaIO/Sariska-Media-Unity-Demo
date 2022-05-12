@@ -1,13 +1,20 @@
 package io.sariska.sariskamediaunityplugin;
 
+import static android.opengl.GLES20.GL_LUMINANCE;
+import static android.opengl.GLES20.GL_RGB;
+import static android.opengl.GLES20.GL_RGBA;
 import static android.opengl.GLES20.GL_TEXTURE_2D;
 import static android.opengl.GLES20.GL_UNSIGNED_BYTE;
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
+
+import static java.nio.IntBuffer.wrap;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -31,6 +38,7 @@ import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -107,7 +115,7 @@ public class SariskaMediaUnityPlugin{
         Bundle options = new Bundle();
         options.putBoolean("audio", true);
         options.putBoolean("video", true);
-        options.putInt("resolution", 360);
+        options.putInt("resolution", 180);
         Log.d(TAG, "We at LocalStream");
 
         SariskaMediaTransport.createLocalTracks(options, tracks -> {
@@ -126,6 +134,10 @@ public class SariskaMediaUnityPlugin{
                                 final int width = i420Buffer.getWidth();
                                 final int height = i420Buffer.getHeight();
                                 byte[] nv21Data = createNV21Data(i420Buffer);
+                                ByteBuffer bufferOfImage = ByteBuffer.wrap(nv21Data);
+                                ByteBuffer YBuffer = i420Buffer.getDataY();
+                                ByteBuffer UBuffer = i420Buffer.getDataU();
+                                ByteBuffer VBuffer  = i420Buffer.getDataV();
                                 YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
                                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                                 yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
@@ -285,15 +297,6 @@ public class SariskaMediaUnityPlugin{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                //Generate OpenGL texture ID
-                int textures[] = new int[1];
-                GLES20.glGenTextures(1, textures, 0);
-                if (textures[0] == 0) {
-                    Log.d(TAG, "No Textures present");
-                }
-                mTextureID = textures[0];
-                mTextureWidth = 480;
-                mTextureHeight = 640;
             }
         });
 
@@ -380,7 +383,7 @@ public class SariskaMediaUnityPlugin{
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GLES20.GL_RGB, width, height, 0, GLES20.GL_RGB, GL_UNSIGNED_BYTE, buffer);
+                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
                 GlUtil.checkNoGLES2Error("EglRenderer.notifyCallbacks");
                 //GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
                 GLES20.glBindTexture(GL_TEXTURE_2D, 0);

@@ -27,6 +27,7 @@ public class ExternalTextureSecond : MonoBehaviour
     private int tapAudio;
     private int tapVideo;
     public Text roomNameText;
+    private GameObject exitImageGameObject;
 
     private void Awake()
     {
@@ -72,7 +73,7 @@ public class ExternalTextureSecond : MonoBehaviour
         remoteImage.texture = remoteTexture2D;
         remoteTexture2D.Apply();
         remoteTexturePointer = remoteTexture2D.GetNativeTexturePtr();
-
+        Debug.Log("we are here");
         BindTexture(remoteTexturePointer, localTexturePointer);
 
     }
@@ -140,7 +141,8 @@ public class ExternalTextureSecond : MonoBehaviour
 
     public void EndCall()
     {
-        mGLTexCtrl.Call("onEndCall");
+        exitImageGameObject.SetActive(true);
+        //mGLTexCtrl.Call("onEndCall");
     }
 
     public void LogOut()
