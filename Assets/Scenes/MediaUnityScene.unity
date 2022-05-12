@@ -809,6 +809,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localImage: {fileID: 0}
   remoteImage: {fileID: 0}
+  roomNameText: {fileID: 0}
 --- !u!1 &532425818
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,8 +845,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -300, y: 1017}
-  m_SizeDelta: {x: 500, y: 200}
+  m_AnchoredPosition: {x: 351.67, y: 980}
+  m_SizeDelta: {x: 343.35, y: 145.5131}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &532425820
 MonoBehaviour:
@@ -869,8 +870,8 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 80
-    m_FontStyle: 0
+    m_FontSize: 40
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 300
@@ -1521,6 +1522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localImage: {fileID: 0}
   remoteImage: {fileID: 0}
+  roomNameText: {fileID: 0}
 --- !u!1 &1646635244
 GameObject:
   m_ObjectHideFlags: 0
@@ -1609,3 +1611,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localImage: {fileID: 1646635246}
   remoteImage: {fileID: 885857625}
+  roomNameText: {fileID: 0}

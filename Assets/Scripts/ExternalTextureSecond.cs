@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class ExternalTextureSecond : MonoBehaviour
 {
     private AndroidJavaObject mGLTexCtrl;
+    bool isPaused = false;
 
     [SerializeField] private RawImage localImage;
     [SerializeField] private RawImage remoteImage;
@@ -15,20 +16,22 @@ public class ExternalTextureSecond : MonoBehaviour
     private int mTextureId;
     private int mWidth;
     private int mHeight;
-    private Texture2D texture2D;
+
+    private Texture2D localTexture2D;
     private Texture2D remoteTexture2D;
-    private IntPtr _nativeTexturePointer;
+
+    private IntPtr remoteTexturePointer;
+    private IntPtr localTexturePointer;
+
     private Token tokenInstance;
     private int tapAudio;
     private int tapVideo;
-    //Buttons
-
-    private Button MuteButton;
-    private Button MuteVideoButton;
-    private Button EndCallButton;
+    public Text roomNameText;
 
     private void Awake()
     {
+        Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
+
         AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass("io.sariska.sariskamediaunityplugin.SariskaMediaUnityPlugin");
         AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivityObject = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
@@ -45,47 +48,55 @@ public class ExternalTextureSecond : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        remoteTexture2D = new Texture2D(1280, 800, TextureFormat.ARGB32, false)
-        { filterMode = FilterMode.Point };
-        remoteTexture2D.Apply();
+        roomNameText = GameObject.Find("RoomName").GetComponent<Text>();
+        roomNameText.text = "Room Name: " + SwitchScene.InputRoomName;
+
+        Debug.Log("We before local texture");
+
+        // local
+        localTexture2D = new Texture2D(480, 640, TextureFormat.ARGB32, false)
+        {
+            filterMode = FilterMode.Point
+        };
+
+        localTexture2D.Apply();
+        localImage.texture = localTexture2D;
+        Debug.Log("Applied local texture");
+        localTexturePointer = localTexture2D.GetNativeTexturePtr();
+        Debug.Log("we after local texture");
+        remoteTexture2D = new Texture2D(480, 640, TextureFormat.ARGB32, false)
+        {
+            filterMode = FilterMode.Point
+        };
+
         remoteImage.texture = remoteTexture2D;
-        _nativeTexturePointer = remoteTexture2D.GetNativeTexturePtr();
+        remoteTexture2D.Apply();
+        remoteTexturePointer = remoteTexture2D.GetNativeTexturePtr();
 
-       
+        BindTexture(remoteTexturePointer, localTexturePointer);
 
-        texture2D = new Texture2D(480, 640, TextureFormat.ARGB32, false);
-        localImage.texture = texture2D;
-        BindTexture(_nativeTexturePointer);
-
-        //Adding Onclick listeners for the buttons
-        MuteButton.onClick.AddListener(MuteUnMuteAudio);
-        MuteVideoButton.onClick.AddListener(MuteVideo);
-        EndCallButton.onClick.AddListener(EndCall);
     }
 
-    private void BindTexture(IntPtr remoteTexturePointer)
+    void OnGUI()
     {
-        mTextureId= mGLTexCtrl.Call<int>("getStreamTextureID",
-                remoteTexturePointer.ToInt32());
+        if (isPaused)
+            GUI.Label(new Rect(100, 100, 50, 30), "Game paused");
+    }
 
-        if (mTextureId == 0)
-        {
-            Debug.Log("Texture ID value is zero");
-        }
-        mWidth = mGLTexCtrl.Call<int>("getStreamTextureWidth");
-        mHeight = mGLTexCtrl.Call<int>("getStreamTextureHeight");
-        Debug.Log("Done getting width and height");
+    void OnApplicationFocus(bool hasFocus)
+    {
+        isPaused = !hasFocus;
+    }
 
-        Texture2D nativeTexture = Texture2D.CreateExternalTexture(
-                mWidth, mHeight,
-                TextureFormat.ARGB32,
-                false, false,
-                (IntPtr)mTextureId);
+    void OnApplicationPause(bool pauseStatus)
+    {
+        isPaused = pauseStatus;
+    }
 
-        texture2D.UpdateExternalTexture(nativeTexture.GetNativeTexturePtr());
+    private void BindTexture(IntPtr remoteTexturePointer, IntPtr localTexturePointer)
+    {
         //Update texture data
-
-        mGLTexCtrl.Call("setupLocalStream");
+        mGLTexCtrl.Call("setupLocalStream", remoteTexturePointer.ToInt32(), localTexturePointer.ToInt32());
     }
 
     public void MuteUnMuteAudio()
@@ -148,6 +159,12 @@ public class ExternalTextureSecond : MonoBehaviour
                 // Quit the application
                 mGLTexCtrl.Call("onEndCall");
             }
+        }
+        Debug.Log("Internet");
+        Debug.Log(Application.internetReachability);
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Debug.Log("Error. Check internet connection!");
         }
     }
 }

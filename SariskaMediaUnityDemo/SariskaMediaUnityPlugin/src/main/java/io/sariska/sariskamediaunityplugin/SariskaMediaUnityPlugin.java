@@ -1,6 +1,7 @@
 package io.sariska.sariskamediaunityplugin;
 
 import static android.opengl.GLES20.GL_TEXTURE_2D;
+import static android.opengl.GLES20.GL_UNSIGNED_BYTE;
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
 import android.app.Activity;
@@ -23,6 +24,8 @@ import android.os.Bundle;
 import android.util.Log;
 import androidx.core.app.ActivityCompat;
 import com.oney.WebRTCModule.WebRTCView;
+
+import org.webrtc.GlUtil;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
@@ -96,7 +99,11 @@ public class SariskaMediaUnityPlugin{
         return true;
     }
 
-    public void setupLocalStream(){
+    public void setupLocalStream(int mRemoteTextureId, int mTextureID){
+
+        this.mTextureID = mTextureID;
+        this.mRemoteTextureId = mRemoteTextureId;
+
         Bundle options = new Bundle();
         options.putBoolean("audio", true);
         options.putBoolean("video", true);
@@ -147,13 +154,7 @@ public class SariskaMediaUnityPlugin{
         });
         connection.connect();
     }
-
-    public static Bitmap RotateBitmap(Bitmap source, float angle)
-    {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-    }
+    
 
     private void createConference() {
         conference = connection.initJitsiConference();
@@ -174,16 +175,9 @@ public class SariskaMediaUnityPlugin{
             runOnUiThread(() -> {
                 if(track.getStreamURL().equals(localTracks.get(1).getStreamURL())){
                     //So as to not add local track in remote container
-
                     return;
                 }
                 if (track.getType().equals("video")) {
-                    mRenderThreadRemote.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            GLES20.glBindTexture(GL_TEXTURE_2D, 0);
-                        }
-                    });
                     WebRTCView view = track.render();
                     view.setMirror(true);
                     remoteVideoTrack = view.getVideoTrackForStreamURL(track.getStreamURL());
@@ -224,9 +218,7 @@ public class SariskaMediaUnityPlugin{
                 });
             });
         });
-
         conference.join();
-
     }
 
     private byte[] createNV21Data(VideoFrame.I420Buffer i420Buffer) {
@@ -375,6 +367,26 @@ public class SariskaMediaUnityPlugin{
 
     public int getStreamTextureHeight(){
         return this.mTextureHeight;
+    }
+
+    public void updateBufferLocalStream(int textureIdLocal, ByteBuffer buffer, int width, int height){
+        mRenderThreadLocal.execute(new Runnable() {
+            @Override
+            public void run() {
+                GLES20.glBindTexture(GL_TEXTURE_2D, textureIdLocal);
+                GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GLES20.GL_RGB, width, height, 0, GLES20.GL_RGB, GL_UNSIGNED_BYTE, buffer);
+                GlUtil.checkNoGLES2Error("EglRenderer.notifyCallbacks");
+                //GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+                GLES20.glBindTexture(GL_TEXTURE_2D, 0);
+                //bitmap.recycle();// Reclaim memory
+            }
+        });
     }
 
     public void updateRemoteVideoStream(Bitmap bitmap, int mTextureIDLocal){
