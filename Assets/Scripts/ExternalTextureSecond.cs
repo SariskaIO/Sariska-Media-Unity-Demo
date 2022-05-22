@@ -141,8 +141,8 @@ public class ExternalTextureSecond : MonoBehaviour
 
     public void EndCall()
     {
-        exitImageGameObject.SetActive(true);
-        //mGLTexCtrl.Call("onEndCall");
+        //exitImageGameObject.SetActive(true);
+        mGLTexCtrl.Call("onEndCall");
     }
 
     public void LogOut()
@@ -161,12 +161,6 @@ public class ExternalTextureSecond : MonoBehaviour
                 // Quit the application
                 mGLTexCtrl.Call("onEndCall");
             }
-        }
-        Debug.Log("Internet");
-        Debug.Log(Application.internetReachability);
-        if (Application.internetReachability == NetworkReachability.NotReachable)
-        {
-            Debug.Log("Error. Check internet connection!");
         }
     }
 }
