@@ -1,24 +1,13 @@
 package io.sariska.sariskamediaunityplugin;
 
-import static android.opengl.GLES20.GL_LUMINANCE;
-import static android.opengl.GLES20.GL_RGB;
 import static android.opengl.GLES20.GL_RGBA;
 import static android.opengl.GLES20.GL_TEXTURE_2D;
 import static android.opengl.GLES20.GL_UNSIGNED_BYTE;
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
-
-import static java.nio.IntBuffer.wrap;
-
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.ColorSpace;
-import android.graphics.ImageFormat;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -27,18 +16,22 @@ import android.opengl.EGLSurface;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.os.Build;
 import android.os.Bundle;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.renderscript.Type;
 import android.util.Log;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import com.oney.WebRTCModule.WebRTCView;
-
 import org.webrtc.GlUtil;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,6 +59,9 @@ public class SariskaMediaUnityPlugin{
     private VideoTrack remoteVideoTrack;
     private Connection connection;
     private Conference conference;
+    private Context context;
+
+
 
 
     //It is called by unity to obtain eglcontext, which is executed in the unity thread
@@ -89,6 +85,7 @@ public class SariskaMediaUnityPlugin{
     }
 
     private SariskaMediaUnityPlugin(Activity unityActivity){
+        this.context = unityActivity;
         SariskaMediaTransport.initializeSdk(unityActivity.getApplication());
         if (!hasPermissions(unityActivity, PERMISSIONS)) {
             ActivityCompat.requestPermissions(unityActivity, PERMISSIONS, PERMISSION_ALL);
@@ -128,26 +125,23 @@ public class SariskaMediaUnityPlugin{
                         localVideoTrack = view.getVideoTrackForStreamURL(track.getStreamURL());
                         localVideoTrack.setEnabled(true);
                         localVideoTrack.addSink(new VideoSink() {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
                             @Override
                             public void onFrame(VideoFrame videoFrame) {
+                                RenderScript RS = RenderScript.create(context);
+                                ScriptIntrinsicYuvToRGB yuvToRgbIntrinsic = ScriptIntrinsicYuvToRGB.create(RS, Element.U8_4(RS));
                                 VideoFrame.I420Buffer i420Buffer = videoFrame.getBuffer().toI420();
                                 final int width = i420Buffer.getWidth();
                                 final int height = i420Buffer.getHeight();
                                 byte[] nv21Data = createNV21Data(i420Buffer);
-                                ByteBuffer bufferOfImage = ByteBuffer.wrap(nv21Data);
-                                ByteBuffer YBuffer = i420Buffer.getDataY();
-                                ByteBuffer UBuffer = i420Buffer.getDataU();
-                                ByteBuffer VBuffer  = i420Buffer.getDataV();
-                                YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
-                                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                                yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
-                                byte[] imageBytes = out.toByteArray();
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inPurgeable = true;
-                                options.inInputShareable = true;
-                                Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                                //Bitmap rotatedImage = RotateBitmap(image, 180f);
-                                updateVideoStream(image, mTextureID);
+                                Type.Builder yuvType = new Type.Builder(RS, Element.U8(RS)).setX(nv21Data.length);
+                                Allocation inData = Allocation.createTyped(RS, yuvType.create(), Allocation.USAGE_SCRIPT);
+                                Type.Builder rgbaType = new Type.Builder(RS, Element.RGBA_8888(RS)).setX(width).setY(height);
+                                Allocation outData = Allocation.createTyped(RS, rgbaType.create(), Allocation.USAGE_SCRIPT);
+                                inData.copyFrom(nv21Data);
+                                yuvToRgbIntrinsic.setInput(inData);
+                                yuvToRgbIntrinsic.forEach(outData);
+                                updateBufferLocalStream(mTextureID, outData.getByteBuffer(), width,height);
                                 i420Buffer.release();
                                 System.gc();
                                 Runtime.getRuntime().gc();
@@ -194,23 +188,24 @@ public class SariskaMediaUnityPlugin{
                     view.setMirror(true);
                     remoteVideoTrack = view.getVideoTrackForStreamURL(track.getStreamURL());
                     remoteVideoTrack.addSink(new VideoSink() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onFrame(VideoFrame videoFrame) {
+                            RenderScript RS = RenderScript.create(context);
+                            ScriptIntrinsicYuvToRGB yuvToRgbIntrinsic = ScriptIntrinsicYuvToRGB.create(RS, Element.U8_4(RS));
                             VideoFrame.I420Buffer i420Buffer = videoFrame.getBuffer().toI420();
                             final int width = i420Buffer.getWidth();
                             final int height = i420Buffer.getHeight();
                             byte[] nv21Data = createNV21Data(i420Buffer);
+                            Type.Builder yuvType = new Type.Builder(RS, Element.U8(RS)).setX(nv21Data.length);
+                            Allocation inData = Allocation.createTyped(RS, yuvType.create(), Allocation.USAGE_SCRIPT);
+                            Type.Builder rgbaType = new Type.Builder(RS, Element.RGBA_8888(RS)).setX(width).setY(height);
+                            Allocation outData = Allocation.createTyped(RS, rgbaType.create(), Allocation.USAGE_SCRIPT);
+                            inData.copyFrom(nv21Data);
+                            yuvToRgbIntrinsic.setInput(inData);
+                            yuvToRgbIntrinsic.forEach(outData);
+                            updateBufferRemoteStream(mRemoteTextureId, outData.getByteBuffer(), width, height);
                             i420Buffer.release();
-                            YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21,width,height,null);
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
-                            byte[] imageBytes = out.toByteArray();
-                            BitmapFactory.Options options = new BitmapFactory.Options();
-                            options.inPurgeable = true;
-                            options.inInputShareable = true;
-                            Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                            //Bitmap rotatedImage = RotateBitmap(image, 180f);
-                            updateRemoteVideoStream(image, mRemoteTextureId);
                             System.gc();
                             Runtime.getRuntime().gc();
                         }
@@ -383,35 +378,14 @@ public class SariskaMediaUnityPlugin{
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, buffer);
+                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
                 GlUtil.checkNoGLES2Error("EglRenderer.notifyCallbacks");
-                //GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
                 GLES20.glBindTexture(GL_TEXTURE_2D, 0);
-                //bitmap.recycle();// Reclaim memory
             }
         });
     }
-
-    public void updateRemoteVideoStream(Bitmap bitmap, int mTextureIDLocal){
+    public void updateBufferRemoteStream(int textureIdLocal, ByteBuffer buffer, int width, int height){
         mRenderThreadRemote.execute(new Runnable() {
-            @Override
-            public void run() {
-                GLES20.glBindTexture(GL_TEXTURE_2D, mTextureIDLocal);
-                GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-                GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-                GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
-                GLES20.glBindTexture(GL_TEXTURE_2D, 0);
-                bitmap.recycle();// Reclaim memory
-            }
-        });
-    }
-
-    public void updateVideoStream(Bitmap bitmap, int textureIdLocal){
-        mRenderThreadLocal.execute(new Runnable() {
             @Override
             public void run() {
                 GLES20.glBindTexture(GL_TEXTURE_2D, textureIdLocal);
@@ -421,9 +395,9 @@ public class SariskaMediaUnityPlugin{
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
                 GLES20.glTexParameteri(GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-                GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
+                GLES20.glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+                GlUtil.checkNoGLES2Error("EglRenderer.notifyCallbacks");
                 GLES20.glBindTexture(GL_TEXTURE_2D, 0);
-                bitmap.recycle();// Reclaim memory
             }
         });
     }
