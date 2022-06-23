@@ -28,8 +28,10 @@ public class ExternalTextureSecond : MonoBehaviour
     private int tapVideo;
     public Text roomNameText;
     public Image myImage;
-    public GameObject muteButton;
-    public Button yourButton;   
+    public GameObject muteAudioObject;
+    public GameObject muteVideoObject;
+    public Button muteButton;
+    public Button muteVideoButton;
     private GameObject exitImageGameObject;
 
     private void Awake()
@@ -44,8 +46,10 @@ public class ExternalTextureSecond : MonoBehaviour
 
         var roomName = SwitchScene.InputRoomName;
         var userName = SwitchScene.InputUserName;
-        muteButton = GameObject.FindWithTag("Mute Button");
-        yourButton = muteButton.GetComponent<Button>();
+        muteAudioObject = GameObject.FindWithTag("Mute Button");
+        muteVideoObject = GameObject.FindWithTag("Mute Video");
+        muteButton = muteAudioObject.GetComponent<Button>();
+        muteVideoButton = muteVideoObject.GetComponent<Button>();
 
         tokenInstance = TokenAPIHelp.GetSessionToken(roomName, userName);
         mGLTexCtrl.Call("setupOpenGL", tokenInstance.token, roomName);
@@ -110,14 +114,14 @@ public class ExternalTextureSecond : MonoBehaviour
 
         if (tapAudio % 2 == 0)
         {
-            yourButton.image.sprite = Resources.Load<Sprite>("mic-off-white") as Sprite;
+            muteButton.image.sprite = Resources.Load<Sprite>("unmute-audio") as Sprite;
             mGLTexCtrl.Call("onMuteAudio");
             tapAudio++;
             
         }
         else
         {
-            yourButton.image.sprite = Resources.Load<Sprite>("micon") as Sprite;
+            muteButton.image.sprite = Resources.Load<Sprite>("mute-audio") as Sprite;
             mGLTexCtrl.Call("onUnMuteAudio");
             tapAudio++;
         }
@@ -127,12 +131,13 @@ public class ExternalTextureSecond : MonoBehaviour
     {
         if (tapVideo % 2 == 0)
         {
-            
+            muteVideoButton.image.sprite = Resources.Load<Sprite>("unmute-video") as Sprite;
             mGLTexCtrl.Call("onMuteVideo");
             tapVideo++;
         }
         else
         {
+            muteVideoButton.image.sprite = Resources.Load<Sprite>("mute-video") as Sprite;
             mGLTexCtrl.Call("onUnMuteVideo");
             tapVideo++;
         }

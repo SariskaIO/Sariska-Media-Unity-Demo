@@ -1,9 +1,9 @@
 {
     "m_SelectedDeviceId": "RZ8N90NGFZM",
     "m_SelectedPackage": {
-        "deviceId": "RZ8N90NGFZM",
-        "name": "io.sariska.unitydemo",
-        "processId": 11214,
+        "deviceId": "",
+        "name": "",
+        "processId": 0,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,175 +11,37 @@
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 32670,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 29455,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 782,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 1038,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 3698,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 5218,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "com.sec.android.app.launcher",
-            "processId": 2617,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 13336,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 22247,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 24902,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 25200,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 26310,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 30957,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 32535,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 32606,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 32420,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 8528,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 13165,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 15762,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 16372,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 17742,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 18943,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 28800,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 2891,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 4670,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 5727,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 7202,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 10125,
-            "exited": false
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
             "processId": 11214,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 26087,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 28941,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 29633,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 30659,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 31223,
             "exited": false
         }
     ],

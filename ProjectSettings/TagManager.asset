@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Mute Button
+  - Mute Video
   layers:
   - Default
   - TransparentFX
