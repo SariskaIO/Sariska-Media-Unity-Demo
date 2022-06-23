@@ -27,6 +27,9 @@ public class ExternalTextureSecond : MonoBehaviour
     private int tapAudio;
     private int tapVideo;
     public Text roomNameText;
+    public Image myImage;
+    public GameObject muteButton;
+    public Button yourButton;   
     private GameObject exitImageGameObject;
 
     private void Awake()
@@ -41,6 +44,8 @@ public class ExternalTextureSecond : MonoBehaviour
 
         var roomName = SwitchScene.InputRoomName;
         var userName = SwitchScene.InputUserName;
+        muteButton = GameObject.FindWithTag("Mute Button");
+        yourButton = muteButton.GetComponent<Button>();
 
         tokenInstance = TokenAPIHelp.GetSessionToken(roomName, userName);
         mGLTexCtrl.Call("setupOpenGL", tokenInstance.token, roomName);
@@ -105,11 +110,14 @@ public class ExternalTextureSecond : MonoBehaviour
 
         if (tapAudio % 2 == 0)
         {
+            yourButton.image.sprite = Resources.Load<Sprite>("mic-off-white") as Sprite;
             mGLTexCtrl.Call("onMuteAudio");
             tapAudio++;
+            
         }
         else
         {
+            yourButton.image.sprite = Resources.Load<Sprite>("micon") as Sprite;
             mGLTexCtrl.Call("onUnMuteAudio");
             tapAudio++;
         }
@@ -119,6 +127,7 @@ public class ExternalTextureSecond : MonoBehaviour
     {
         if (tapVideo % 2 == 0)
         {
+            
             mGLTexCtrl.Call("onMuteVideo");
             tapVideo++;
         }

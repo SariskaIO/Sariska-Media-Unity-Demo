@@ -590,7 +590,7 @@ GameObject:
   - component: {fileID: 473598072}
   m_Layer: 5
   m_Name: Mute Button
-  m_TagString: Untagged
+  m_TagString: Mute Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -692,7 +692,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 28f5033ce8ec24328bfe27f1638f9588, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31ae93fe48eba4f9ab219efa8773efdb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -810,6 +810,9 @@ MonoBehaviour:
   localImage: {fileID: 0}
   remoteImage: {fileID: 0}
   roomNameText: {fileID: 0}
+  myImage: {fileID: 0}
+  muteButton: {fileID: 0}
+  yourButton: {fileID: 0}
 --- !u!1 &532425818
 GameObject:
   m_ObjectHideFlags: 0
@@ -1523,6 +1526,9 @@ MonoBehaviour:
   localImage: {fileID: 0}
   remoteImage: {fileID: 0}
   roomNameText: {fileID: 0}
+  myImage: {fileID: 0}
+  muteButton: {fileID: 0}
+  yourButton: {fileID: 0}
 --- !u!1 &1646635244
 GameObject:
   m_ObjectHideFlags: 0
@@ -1612,3 +1618,6 @@ MonoBehaviour:
   localImage: {fileID: 1646635246}
   remoteImage: {fileID: 885857625}
   roomNameText: {fileID: 0}
+  myImage: {fileID: 0}
+  muteButton: {fileID: 0}
+  yourButton: {fileID: 0}
