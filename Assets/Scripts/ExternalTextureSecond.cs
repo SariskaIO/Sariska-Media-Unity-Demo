@@ -4,176 +4,169 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Runtime.InteropServices;
+using Plugins.NumberOfUsers;
 
-public class ExternalTextureSecond : MonoBehaviour
+namespace Plugins.ExternalTextureSecond
 {
-    private AndroidJavaObject mGLTexCtrl;
-    bool isPaused = false;
-
-    [SerializeField] private RawImage localImage;
-    [SerializeField] private RawImage remoteImage;
-
-    private int mTextureId;
-    private int mWidth;
-    private int mHeight;
-
-    private Texture2D localTexture2D;
-    private Texture2D remoteTexture2D;
-
-    private IntPtr remoteTexturePointer;
-    private IntPtr localTexturePointer;
-
-    private Token tokenInstance;
-    private int tapAudio;
-    private int tapVideo;
-    public Text roomNameText;
-    public Image myImage;
-    public GameObject muteAudioObject;
-    public GameObject muteVideoObject;
-    public Button muteButton;
-    public Button muteVideoButton;
-    private GameObject exitImageGameObject;
-
-    private void Awake()
+    public static class ExternalTextureSecond
     {
-        Screen.sleepTimeout = (int)SleepTimeout.NeverSleep;
+        private static AndroidJavaObject mGLTexCtrl;
 
-        AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass("io.sariska.sariskamediaunityplugin.SariskaMediaUnityPlugin");
-        AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject currentActivityObject = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
-        mGLTexCtrl = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
-        //tokenInstance = TokenAPIHelp.GetSessionToken("dipak");
+        private const string GAME_OBJECT_NAME = "PluginBridge";
 
-        var roomName = SwitchScene.InputRoomName;
-        var userName = SwitchScene.InputUserName;
-        muteAudioObject = GameObject.FindWithTag("Mute Button");
-        muteVideoObject = GameObject.FindWithTag("Mute Video");
-        muteButton = muteAudioObject.GetComponent<Button>();
-        muteVideoButton = muteVideoObject.GetComponent<Button>();
+        private static GameObject gameObject;
 
-        tokenInstance = TokenAPIHelp.GetSessionToken(roomName, userName);
-        mGLTexCtrl.Call("setupOpenGL", tokenInstance.token, roomName);
-    }
+        private const string JAVA_OBJECT_NAME = "io.sariska.sariskamediaaudiounitymodule.SariskaAudioUnityDemo";
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        roomNameText = GameObject.Find("RoomName").GetComponent<Text>();
-        roomNameText.text = "Room Name: " + SwitchScene.InputRoomName;
+        private static AndroidJavaObject androidJavaNativeCalculation;
 
-        Debug.Log("We before local texture");
+        private static int numberOfUsers = 1;
 
-        // local
-        localTexture2D = new Texture2D(480, 640, TextureFormat.ARGB32, false)
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string initializeSariskaMediaTransport(); //External native method
+
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string onMuteAudioIos(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string onUnMuteAudioIos(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string onSpeakerIos(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string offSpeakerIos(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string onLogoutIos(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern string onEndCallIos(); //External native method
+
+        private class PlatformNotSupportedException : Exception
         {
-            filterMode = FilterMode.Point
-        };
-
-        localTexture2D.Apply();
-        localImage.texture = localTexture2D;
-        Debug.Log("Applied local texture");
-        localTexturePointer = localTexture2D.GetNativeTexturePtr();
-        Debug.Log("we after local texture");
-        remoteTexture2D = new Texture2D(480, 640, TextureFormat.ARGB32, false)
-        {
-            filterMode = FilterMode.Point
-        };
-
-        remoteImage.texture = remoteTexture2D;
-        remoteTexture2D.Apply();
-        remoteTexturePointer = remoteTexture2D.GetNativeTexturePtr();
-        Debug.Log("we are here");
-        BindTexture(remoteTexturePointer, localTexturePointer);
-
-    }
-
-    void OnGUI()
-    {
-        if (isPaused)
-            GUI.Label(new Rect(100, 100, 50, 30), "Game paused");
-    }
-
-    void OnApplicationFocus(bool hasFocus)
-    {
-        isPaused = !hasFocus;
-    }
-
-    void OnApplicationPause(bool pauseStatus)
-    {
-        isPaused = pauseStatus;
-    }
-
-    private void BindTexture(IntPtr remoteTexturePointer, IntPtr localTexturePointer)
-    {
-        //Update texture data
-        mGLTexCtrl.Call("setupLocalStream", remoteTexturePointer.ToInt32(), localTexturePointer.ToInt32());
-    }
-
-    public void MuteUnMuteAudio()
-    {
-
-        if (tapAudio % 2 == 0)
-        {
-            muteButton.image.sprite = Resources.Load<Sprite>("unmute-audio") as Sprite;
-            mGLTexCtrl.Call("onMuteAudio");
-            tapAudio++;
-            
+            public PlatformNotSupportedException() : base() { }
         }
-        else
-        {
-            muteButton.image.sprite = Resources.Load<Sprite>("mute-audio") as Sprite;
-            mGLTexCtrl.Call("onUnMuteAudio");
-            tapAudio++;
-        }
-    }
 
-    public void MuteVideo()
-    {
-        if (tapVideo % 2 == 0)
-        {
-            muteVideoButton.image.sprite = Resources.Load<Sprite>("unmute-video") as Sprite;
-            mGLTexCtrl.Call("onMuteVideo");
-            tapVideo++;
-        }
-        else
-        {
-            muteVideoButton.image.sprite = Resources.Load<Sprite>("mute-video") as Sprite;
-            mGLTexCtrl.Call("onUnMuteVideo");
-            tapVideo++;
-        }
-    }
 
-    public void switchCamera()
-    {
-        mGLTexCtrl.Call("onSwitchCamera");
-    }
+        static ExternalTextureSecond(){
 
-    public void onSpeaker()
-    {
-        mGLTexCtrl.Call("onSpeakerChanges");
-    }
+            gameObject = new GameObject();
 
-    public void EndCall()
-    {
-        //exitImageGameObject.SetActive(true);
-        mGLTexCtrl.Call("onEndCall");
-    }
+            gameObject.name = "PluginBridge";
 
-    public void LogOut()
-    {
-        mGLTexCtrl.Call("onLogout");
-        SceneManager.LoadScene(sceneName: "LandingPage");
-    }
+            gameObject.AddComponent<NativeCallbackHandler>();
 
-    public void Update()
-    {
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            // Check if Back was pressed this frame
-            if (Input.GetKeyDown(KeyCode.Escape))
+            UnityEngine.Object.DontDestroyOnLoad(gameObject);
+
+            switch (Application.platform)
             {
-                // Quit the application
-                mGLTexCtrl.Call("onEndCall");
+                case RuntimePlatform.Android:
+                    var androidJavaUnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+
+                    AndroidJavaObject currentActivityObject = androidJavaUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+                    AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass(JAVA_OBJECT_NAME);
+
+                    androidJavaNativeCalculation = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
+
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    // No initialization needed
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+
+            }
+        }
+
+        // Start is called before the first frame update
+        public static void StartAudioCall(string token)
+        {
+            var someToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmYjc1MTJjZjgzYzdkYTRjMjM0Y2QzYWEyYWViOTUzMGNlZmUwMDg1YzRiZjljYzgwY2U5YmQ5YmRiNjA3ZjciLCJ0eXAiOiJKV1QifQ.eyJjb250ZXh0Ijp7InVzZXIiOnsiaWQiOiJydWx2enJuayIsImF2YXRhciI6IiM1NkQxQjQiLCJuYW1lIjoic2RzZHMifSwiZ3JvdXAiOiIxIn0sInN1YiI6InVhdG5jb2U1djcybG5vaGxud2dxdjgiLCJyb29tIjoiKiIsImlhdCI6MTY1ODk0OTg5MSwibmJmIjoxNjU4OTQ5ODkxLCJpc3MiOiJzYXJpc2thIiwiYXVkIjoibWVkaWFfbWVzc2FnaW5nX2NvLWJyb3dzaW5nIiwiZXhwIjoxNjU5MTIyNjkxfQ.KimVuxBLPi3D56wxqcC_jNys2qWcZIUF-culdbR1GJGZJB6B4zn4JfLtwVOSUyALHFaVjgGuH0ZnN6W2_EgB-FEIkN8KpXfFZp0SEqpc62F39g7DdS_eKiyntqUXrgOUORYTCLwWuWarY6AHPgy_SXiFGxez0eAK5sfu1SaQIcAv_Bu3-a2ICAhKfmBnjS-Rj-yBYRSD7BaEgBwvxj99iFuANdXRN_5TLJ0zBtZC6-gFixEGPNALs77qHpdTMsSAXmGVc5gJLNe6OOTzhVyMZl9k2w4Stf3WJbh2vhrIx2RzqjeNbS-Ywrcjnx9bSKUCj9Wh6vKlm5LaaUiy3_1WJA";
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("startAudioCall", token, "dipak");
+                    break;
+                case RuntimePlatform.IPhonePlayer:
+                    initializeSariskaMediaTransport();
+                    break;
+                default:
+                    throw new PlatformNotSupportedException();
+
+            }
+        }
+
+        private class NativeCallbackHandler : MonoBehaviour
+        {
+            public GameObject prefab;
+
+            //public int numbersToCreate;
+
+            private void HandleTrackAdded(string exception)
+            {
+                Debug.Log(exception);
+                numberOfUsers = numberOfUsers + 1;
+                NumberOfUsers.NumberOfUsers.numberOfUsers = numberOfUsers;
+                NumberOfUsers.NumberOfUsers.userChanged = true;
+                Debug.Log("number of user = " + numberOfUsers);
+            }
+
+            private void HandleTrackRemoved(string exception)
+            {
+                numberOfUsers = numberOfUsers - 1;
+                NumberOfUsers.NumberOfUsers.numberOfUsers = numberOfUsers;
+                NumberOfUsers.NumberOfUsers.userChanged = true;
+                Debug.Log("number of user after removal = " + numberOfUsers);
+            }
+        }
+
+
+        public static void nativeGenericCallHandler(string onMethodCalled)
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call(onMethodCalled);
+                    break;
+                case RuntimePlatform.IPhonePlayer:
+                    switch (onMethodCalled)
+                    {
+                        case "onMuteAudio":
+                            onMuteAudioIos();
+                            break;
+                        case "onUnMuteAudio":
+                            onUnMuteAudioIos();
+                            break;
+                        case "onSpeaker":
+                            onSpeakerIos();
+                            break;
+                        case "offSpeaker":
+                            offSpeakerIos();
+                            break;
+                        case "onLogout":
+                            onLogoutIos();
+                            break;
+                        case "onEndCall":
+                            onEndCallIos();
+                            break;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

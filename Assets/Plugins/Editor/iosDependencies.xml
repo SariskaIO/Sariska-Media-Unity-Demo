@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dependencies>
     <iosPods>
-        <iosPod name="sariska-media-transport" addToAllTargets="false">
+        <iosPod name="sariska-media-transport-ios" addToAllTargets="false">
         <sources>
             <source>https://github.com/SariskaIO/sariska-ios-sdk-releases</source>
         </sources>
@@ -11,6 +11,6 @@
         <repositories>
       <repository>https://maven.pkg.github.com/SariskaIO/maven-repository</repository>
     </repositories>
-    <androidPackage spec="io.sariska:sariska-media-transport:5.2.1-exp"></androidPackage>
+    <androidPackage spec="io.sariska:sariska-media-transport:5.2.4"></androidPackage>
   </androidPackages>
 </dependencies>

@@ -20,7 +20,7 @@ apply plugin: 'com.android.library'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 // Android Resolver Dependencies Start
-    implementation 'io.sariska:sariska-media-transport:5.2.1-exp' // Assets/Plugins/Editor/iosDependencies.xml:14
+    implementation 'io.sariska:sariska-media-transport:5.2.4' // Assets/Plugins/Editor/iosDependencies.xml:14
 // Android Resolver Dependencies End
 **DEPS**}
 
