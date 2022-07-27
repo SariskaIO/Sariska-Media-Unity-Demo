@@ -305,7 +305,6 @@ IL2CPP_EXTERN_C String_t* _stringLiteral0DFCF0588B68D7A984E760218A78D2F4DDD2C965
 IL2CPP_EXTERN_C String_t* _stringLiteral0F6552C8B11F66A2DEBFB5EB3DB40A93C049AB3B;
 IL2CPP_EXTERN_C String_t* _stringLiteral14A27E70F6CCA9275F2C3CF7BC87225F99690BD8;
 IL2CPP_EXTERN_C String_t* _stringLiteral14E338D17C42E552FA7AF42CDAE40CA1F0E8A04D;
-IL2CPP_EXTERN_C String_t* _stringLiteral1E90DE149739145219D9AE8568D241C52067C5D0;
 IL2CPP_EXTERN_C String_t* _stringLiteral20447C2A5E15207F56042895F8145FDA12DC4DAC;
 IL2CPP_EXTERN_C String_t* _stringLiteral32F3DD73049A39D0D6EA6E63649C09814FEC9174;
 IL2CPP_EXTERN_C String_t* _stringLiteral3307E245CDDD41589E1B19DE33F9663FAC31171F;
@@ -332,14 +331,13 @@ IL2CPP_EXTERN_C String_t* _stringLiteralE7326BF4F127FE73C28CD270B3A193A960A76218
 IL2CPP_EXTERN_C String_t* _stringLiteralE83842D0A32F552DD118D279BCE7433F22C6627B;
 IL2CPP_EXTERN_C String_t* _stringLiteralEFDA7B01A37510B4A8D129690E3106942DA400AD;
 IL2CPP_EXTERN_C String_t* _stringLiteralF41EC4B41F1AAFEEF2D77AE09AAE07E1721D2900;
-IL2CPP_EXTERN_C String_t* _stringLiteralF8F794CCE4C7CD1555F11A401B659F7A1C445DA0;
 IL2CPP_EXTERN_C String_t* _stringLiteralFA071198F5CB0A3ADE073B6D1724B0C1DF8ACB15;
 IL2CPP_EXTERN_C String_t* _stringLiteralFB4AE4F77150C3A8E8E4F8B23E734E0C7277B7D9;
 IL2CPP_EXTERN_C String_t* _stringLiteralFFCFAAE6DC6122FF5D78BC9F4A81BD36217AA87A;
 IL2CPP_EXTERN_C const RuntimeMethod* AndroidJavaObject_CallStatic_TisAndroidJavaObject_t8FFB930F335C1178405B82AC2BF512BB1EEF9EB0_m398EA96C1DE1BB885F2B1DD0E00E8BBA86B49E63_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* AndroidJavaObject_GetStatic_TisAndroidJavaObject_t8FFB930F335C1178405B82AC2BF512BB1EEF9EB0_mD7D192A35EB2B2DA3775FAB081958B72088251DD_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* Array_Empty_TisRuntimeObject_m55011E8360A8199FB239A5787BA8631CDD6116FC_RuntimeMethod_var;
-IL2CPP_EXTERN_C const RuntimeMethod* ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B_RuntimeMethod_var;
+IL2CPP_EXTERN_C const RuntimeMethod* ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* ExternalTextureSecond__cctor_mBEB46F3AB3A35D6F969BC28FE70284F8C4EDC2F6_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* GameObject_AddComponent_TisNativeCallbackHandler_t489F77C9B0C629683223D85E418DE3C37626911F_m27594C0580CFD73B356105E3D9CB08D11E371CB0_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* GameObject_GetComponent_TisButton_t6786514A57F7AFDEE5431112FEA0CAB24F5AE098_mB997CBF78A37938DC1624352E12D0205078CB290_RuntimeMethod_var;
@@ -1269,6 +1267,10 @@ struct CallingExample_t4ABE6E23DE554E7CB7F53D471B58B3EF5AF7B7AB  : public MonoBe
 	Button_t6786514A57F7AFDEE5431112FEA0CAB24F5AE098* ___speakerButton_7;
 	// Token CallingExample::tokenInstance
 	Token_t98C63F450DC6EE55860A2E91BF1B3C00350142A9* ___tokenInstance_10;
+	// System.String CallingExample::roomName
+	String_t* ___roomName_11;
+	// System.String CallingExample::userName
+	String_t* ___userName_12;
 };
 
 struct CallingExample_t4ABE6E23DE554E7CB7F53D471B58B3EF5AF7B7AB_StaticFields
@@ -1782,8 +1784,8 @@ inline Button_t6786514A57F7AFDEE5431112FEA0CAB24F5AE098* GameObject_GetComponent
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Token_t98C63F450DC6EE55860A2E91BF1B3C00350142A9* TokenAPIHelp_GetSessionToken_mFC4B5526AEF58FB43D261B8174A7147050CB83D3 (String_t* ___RoomName0, String_t* ___UserName1, const RuntimeMethod* method) ;
 // System.Void UnityEngine.Debug::Log(System.Object)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Debug_Log_m86567BCF22BBE7809747817453CACA0E41E68219 (RuntimeObject* ___message0, const RuntimeMethod* method) ;
-// System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::StartAudioCall(System.String)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B (String_t* ___token0, const RuntimeMethod* method) ;
+// System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::StartAudioCall(System.String,System.String)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446 (String_t* ___token0, String_t* ___userName1, const RuntimeMethod* method) ;
 // System.Void UnityEngine.Debug::LogError(System.Object)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Debug_LogError_m059825802BB6AF7EA9693FEBEEB0D85F59A3E38E (RuntimeObject* ___message0, const RuntimeMethod* method) ;
 // UnityEngine.UI.Image UnityEngine.UI.Selectable::get_image()
@@ -1934,10 +1936,9 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CallingExample_Awake_m6CB8A3554C26E4119E
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&GameObject_GetComponent_TisButton_t6786514A57F7AFDEE5431112FEA0CAB24F5AE098_mB997CBF78A37938DC1624352E12D0205078CB290_RuntimeMethod_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral1E90DE149739145219D9AE8568D241C52067C5D0);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&SwitchScene_t9688B1ED1B73D992F6DD75DE112AC5ACD5FC362E_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral682613F9D2F557428095397B7C79AB21F8C6498C);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral73127A1AEB1A68158127FD38896772DEBF8DC320);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralF8F794CCE4C7CD1555F11A401B659F7A1C445DA0);
 		s_Il2CppMethodInitialized = true;
 	}
 	{
@@ -1965,11 +1966,21 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CallingExample_Awake_m6CB8A3554C26E4119E
 		L_5 = GameObject_GetComponent_TisButton_t6786514A57F7AFDEE5431112FEA0CAB24F5AE098_mB997CBF78A37938DC1624352E12D0205078CB290(L_4, GameObject_GetComponent_TisButton_t6786514A57F7AFDEE5431112FEA0CAB24F5AE098_mB997CBF78A37938DC1624352E12D0205078CB290_RuntimeMethod_var);
 		__this->___speakerButton_7 = L_5;
 		Il2CppCodeGenWriteBarrier((void**)(&__this->___speakerButton_7), (void*)L_5);
-		// tokenInstance  = TokenAPIHelp.GetSessionToken("dipak", "some");
-		Token_t98C63F450DC6EE55860A2E91BF1B3C00350142A9* L_6;
-		L_6 = TokenAPIHelp_GetSessionToken_mFC4B5526AEF58FB43D261B8174A7147050CB83D3(_stringLiteral1E90DE149739145219D9AE8568D241C52067C5D0, _stringLiteralF8F794CCE4C7CD1555F11A401B659F7A1C445DA0, NULL);
-		__this->___tokenInstance_10 = L_6;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->___tokenInstance_10), (void*)L_6);
+		// roomName = SwitchScene.InputRoomName;
+		String_t* L_6 = ((SwitchScene_t9688B1ED1B73D992F6DD75DE112AC5ACD5FC362E_StaticFields*)il2cpp_codegen_static_fields_for(SwitchScene_t9688B1ED1B73D992F6DD75DE112AC5ACD5FC362E_il2cpp_TypeInfo_var))->___InputRoomName_4;
+		__this->___roomName_11 = L_6;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___roomName_11), (void*)L_6);
+		// userName = SwitchScene.InputUserName;
+		String_t* L_7 = ((SwitchScene_t9688B1ED1B73D992F6DD75DE112AC5ACD5FC362E_StaticFields*)il2cpp_codegen_static_fields_for(SwitchScene_t9688B1ED1B73D992F6DD75DE112AC5ACD5FC362E_il2cpp_TypeInfo_var))->___InputUserName_5;
+		__this->___userName_12 = L_7;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___userName_12), (void*)L_7);
+		// tokenInstance  = TokenAPIHelp.GetSessionToken(roomName, userName);
+		String_t* L_8 = __this->___roomName_11;
+		String_t* L_9 = __this->___userName_12;
+		Token_t98C63F450DC6EE55860A2E91BF1B3C00350142A9* L_10;
+		L_10 = TokenAPIHelp_GetSessionToken_mFC4B5526AEF58FB43D261B8174A7147050CB83D3(L_8, L_9, NULL);
+		__this->___tokenInstance_10 = L_10;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___tokenInstance_10), (void*)L_10);
 		// }
 		return;
 	}
@@ -1991,36 +2002,37 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CallingExample_Start_m4D885D793A1468C540
 		// Debug.Log("Calling Example Started");
 		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		Debug_Log_m86567BCF22BBE7809747817453CACA0E41E68219(_stringLiteralE83842D0A32F552DD118D279BCE7433F22C6627B, NULL);
-		// ExternalTextureSecond.StartAudioCall(tokenInstance.token);
+		// ExternalTextureSecond.StartAudioCall(tokenInstance.token, roomName);
 		Token_t98C63F450DC6EE55860A2E91BF1B3C00350142A9* L_0 = __this->___tokenInstance_10;
 		NullCheck(L_0);
 		String_t* L_1 = L_0->___token_0;
+		String_t* L_2 = __this->___roomName_11;
 		il2cpp_codegen_runtime_class_init_inline(ExternalTextureSecond_tE5C2B3E3E116EE8758BF9A14184F49EB477CFEC4_il2cpp_TypeInfo_var);
-		ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B(L_1, NULL);
+		ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446(L_1, L_2, NULL);
 		// }
-		goto IL_0023;
+		goto IL_0029;
 	}// end try (depth: 1)
 	catch(Il2CppExceptionWrapper& e)
 	{
 		if(il2cpp_codegen_class_is_assignable_from (((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Exception_t_il2cpp_TypeInfo_var)), il2cpp_codegen_object_class(e.ex)))
 		{
 			IL2CPP_PUSH_ACTIVE_EXCEPTION(e.ex);
-			goto CATCH_001c;
+			goto CATCH_0022;
 		}
 		throw e;
 	}
 
-CATCH_001c:
+CATCH_0022:
 	{// begin catch(System.Exception)
 		// Debug.LogError(exception);
 		il2cpp_codegen_runtime_class_init_inline(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var)));
 		Debug_LogError_m059825802BB6AF7EA9693FEBEEB0D85F59A3E38E(((Exception_t*)IL2CPP_GET_ACTIVE_EXCEPTION(Exception_t*)), NULL);
 		// }
 		IL2CPP_POP_ACTIVE_EXCEPTION();
-		goto IL_0023;
+		goto IL_0029;
 	}// end catch (depth: 1)
 
-IL_0023:
+IL_0029:
 	{
 		// }
 		return;
@@ -2934,15 +2946,14 @@ IL_0082:
 		return;
 	}
 }
-// System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::StartAudioCall(System.String)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B (String_t* ___token0, const RuntimeMethod* method) 
+// System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::StartAudioCall(System.String,System.String)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446 (String_t* ___token0, String_t* ___userName1, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ExternalTextureSecond_tE5C2B3E3E116EE8758BF9A14184F49EB477CFEC4_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral1E90DE149739145219D9AE8568D241C52067C5D0);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralFA071198F5CB0A3ADE073B6D1724B0C1DF8ACB15);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -2955,18 +2966,18 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ExternalTextureSecond_StartAudioCall_m63
 		int32_t L_1 = V_0;
 		if ((((int32_t)L_1) == ((int32_t)8)))
 		{
-			goto IL_0031;
+			goto IL_002d;
 		}
 	}
 	{
 		int32_t L_2 = V_0;
 		if ((!(((uint32_t)L_2) == ((uint32_t)((int32_t)11)))))
 		{
-			goto IL_0038;
+			goto IL_0034;
 		}
 	}
 	{
-		// androidJavaNativeCalculation.Call("startAudioCall", token, "dipak");
+		// androidJavaNativeCalculation.Call("startAudioCall", token, userName);
 		il2cpp_codegen_runtime_class_init_inline(ExternalTextureSecond_tE5C2B3E3E116EE8758BF9A14184F49EB477CFEC4_il2cpp_TypeInfo_var);
 		AndroidJavaObject_t8FFB930F335C1178405B82AC2BF512BB1EEF9EB0* L_3 = ((ExternalTextureSecond_tE5C2B3E3E116EE8758BF9A14184F49EB477CFEC4_StaticFields*)il2cpp_codegen_static_fields_for(ExternalTextureSecond_tE5C2B3E3E116EE8758BF9A14184F49EB477CFEC4_il2cpp_TypeInfo_var))->___androidJavaNativeCalculation_4;
 		ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918* L_4 = (ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918*)(ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918*)SZArrayNew(ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var, (uint32_t)2);
@@ -2976,32 +2987,33 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ExternalTextureSecond_StartAudioCall_m63
 		ArrayElementTypeCheck (L_5, L_6);
 		(L_5)->SetAt(static_cast<il2cpp_array_size_t>(0), (RuntimeObject*)L_6);
 		ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918* L_7 = L_5;
+		String_t* L_8 = ___userName1;
 		NullCheck(L_7);
-		ArrayElementTypeCheck (L_7, _stringLiteral1E90DE149739145219D9AE8568D241C52067C5D0);
-		(L_7)->SetAt(static_cast<il2cpp_array_size_t>(1), (RuntimeObject*)_stringLiteral1E90DE149739145219D9AE8568D241C52067C5D0);
+		ArrayElementTypeCheck (L_7, L_8);
+		(L_7)->SetAt(static_cast<il2cpp_array_size_t>(1), (RuntimeObject*)L_8);
 		NullCheck(L_3);
 		AndroidJavaObject_Call_mDEF7846E2AB1C5379069BB21049ED55A9D837B1C(L_3, _stringLiteralFA071198F5CB0A3ADE073B6D1724B0C1DF8ACB15, L_7, NULL);
 		// break;
 		return;
 	}
 
-IL_0031:
+IL_002d:
 	{
 		// initializeSariskaMediaTransport();
 		il2cpp_codegen_runtime_class_init_inline(ExternalTextureSecond_tE5C2B3E3E116EE8758BF9A14184F49EB477CFEC4_il2cpp_TypeInfo_var);
-		String_t* L_8;
-		L_8 = ExternalTextureSecond_initializeSariskaMediaTransport_m9EBCF62C4F9CE9F2A9C8883910C4CC41593D9F05(NULL);
+		String_t* L_9;
+		L_9 = ExternalTextureSecond_initializeSariskaMediaTransport_m9EBCF62C4F9CE9F2A9C8883910C4CC41593D9F05(NULL);
 		// break;
 		return;
 	}
 
-IL_0038:
+IL_0034:
 	{
 		// throw new PlatformNotSupportedException();
-		PlatformNotSupportedException_tA0F8F129929116455D93392B1644B352FE48A2BD* L_9 = (PlatformNotSupportedException_tA0F8F129929116455D93392B1644B352FE48A2BD*)il2cpp_codegen_object_new(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&PlatformNotSupportedException_tA0F8F129929116455D93392B1644B352FE48A2BD_il2cpp_TypeInfo_var)));
-		NullCheck(L_9);
-		PlatformNotSupportedException__ctor_mCEFBB7D6AA52EA85E07C5C86C3533893E492AAA3(L_9, NULL);
-		IL2CPP_RAISE_MANAGED_EXCEPTION(L_9, ((RuntimeMethod*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B_RuntimeMethod_var)));
+		PlatformNotSupportedException_tA0F8F129929116455D93392B1644B352FE48A2BD* L_10 = (PlatformNotSupportedException_tA0F8F129929116455D93392B1644B352FE48A2BD*)il2cpp_codegen_object_new(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&PlatformNotSupportedException_tA0F8F129929116455D93392B1644B352FE48A2BD_il2cpp_TypeInfo_var)));
+		NullCheck(L_10);
+		PlatformNotSupportedException__ctor_mCEFBB7D6AA52EA85E07C5C86C3533893E492AAA3(L_10, NULL);
+		IL2CPP_RAISE_MANAGED_EXCEPTION(L_10, ((RuntimeMethod*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446_RuntimeMethod_var)));
 	}
 }
 // System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::nativeGenericCallHandler(System.String)

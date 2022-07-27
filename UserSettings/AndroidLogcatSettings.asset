@@ -3,29 +3,11 @@
     "m_SelectedPackage": {
         "deviceId": "RZ8N90NGFZM",
         "name": "io.sariska.unitydemo",
-        "processId": 18837,
+        "processId": 3836,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 11214,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 26087,
-            "exited": true
-        },
-        {
-            "deviceId": "RZ8N90NGFZM",
-            "name": "io.sariska.unitydemo",
-            "processId": 28941,
-            "exited": true
-        },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
@@ -42,12 +24,30 @@
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
             "processId": 31223,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
             "processId": 18837,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "com.sec.android.app.launcher",
+            "processId": 2875,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 23651,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 3836,
             "exited": false
         }
     ],

@@ -23,6 +23,10 @@ public class CallingExample : MonoBehaviour
 
     private Token tokenInstance;
 
+    public string roomName;
+
+    public string userName;
+
 
     private void Awake()
     {
@@ -32,7 +36,10 @@ public class CallingExample : MonoBehaviour
         speakerObject = GameObject.FindWithTag("Speaker Button");
         speakerButton = speakerObject.GetComponent<Button>();
 
-        tokenInstance  = TokenAPIHelp.GetSessionToken("dipak", "some");
+        roomName = SwitchScene.InputRoomName;
+        userName = SwitchScene.InputUserName;
+
+        tokenInstance  = TokenAPIHelp.GetSessionToken(roomName, userName);
     }
 
     void Start()
@@ -40,7 +47,7 @@ public class CallingExample : MonoBehaviour
         try
         {
             Debug.Log("Calling Example Started");
-            ExternalTextureSecond.StartAudioCall(tokenInstance.token);
+            ExternalTextureSecond.StartAudioCall(tokenInstance.token, roomName);
         }
         catch(Exception exception)
         {

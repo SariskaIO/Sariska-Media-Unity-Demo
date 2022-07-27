@@ -72,8 +72,8 @@ extern void ExternalTextureSecond_onLogoutIos_m5B858FC1059B4D7467AA0DAE6D7DADD44
 extern void ExternalTextureSecond_onEndCallIos_m477FA472D5B6EEC1987FE0F1FD0CEA47CDEABB90 (void);
 // 0x0000001E System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::.cctor()
 extern void ExternalTextureSecond__cctor_mBEB46F3AB3A35D6F969BC28FE70284F8C4EDC2F6 (void);
-// 0x0000001F System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::StartAudioCall(System.String)
-extern void ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B (void);
+// 0x0000001F System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::StartAudioCall(System.String,System.String)
+extern void ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446 (void);
 // 0x00000020 System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond::nativeGenericCallHandler(System.String)
 extern void ExternalTextureSecond_nativeGenericCallHandler_m1DA3188C142C9F2E8BF3EA1E4787F073C0F356BF (void);
 // 0x00000021 System.Void Plugins.ExternalTextureSecond.ExternalTextureSecond/PlatformNotSupportedException::.ctor()
@@ -116,7 +116,7 @@ static Il2CppMethodPointer s_methodPointers[36] =
 	ExternalTextureSecond_onLogoutIos_m5B858FC1059B4D7467AA0DAE6D7DADD446BA7F97,
 	ExternalTextureSecond_onEndCallIos_m477FA472D5B6EEC1987FE0F1FD0CEA47CDEABB90,
 	ExternalTextureSecond__cctor_mBEB46F3AB3A35D6F969BC28FE70284F8C4EDC2F6,
-	ExternalTextureSecond_StartAudioCall_m63674797253F01F9DE98DF42B5056EFCC49A400B,
+	ExternalTextureSecond_StartAudioCall_m4904D1BB288B8AC0135E74F85D69B740089EF446,
 	ExternalTextureSecond_nativeGenericCallHandler_m1DA3188C142C9F2E8BF3EA1E4787F073C0F356BF,
 	PlatformNotSupportedException__ctor_mCEFBB7D6AA52EA85E07C5C86C3533893E492AAA3,
 	NativeCallbackHandler_HandleTrackAdded_m59887AA5EFE04D0BC3AFAA44AD7FC2BDABB76607,
@@ -155,7 +155,7 @@ static const int32_t s_InvokerIndices[36] =
 	8612,
 	8612,
 	8638,
-	7849,
+	6655,
 	7849,
 	4602,
 	3722,

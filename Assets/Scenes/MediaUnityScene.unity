@@ -676,6 +676,8 @@ MonoBehaviour:
   speakerObject: {fileID: 0}
   muteButton: {fileID: 0}
   speakerButton: {fileID: 0}
+  roomName: 
+  userName: 
 --- !u!1 &532425818
 GameObject:
   m_ObjectHideFlags: 0
