@@ -11,6 +11,8 @@ namespace Plugins.NumberOfUsers
         public static GameObject[] prefabGameObject = new GameObject[numberOfUsers];
 
         public static bool userChanged = false;
+
+        public static Dictionary<int, string> participantList = new Dictionary<int,string>();
     }
 }
 

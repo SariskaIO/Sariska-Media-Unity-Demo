@@ -1,9 +1,14 @@
 
 #import <sariska/sariska.h>
+#import "UnityForwardDecls.h"
+
 char const *GAME_OBJECT = "PluginBridge";
 @interface SariskaNativeiOSPlugin : NSObject
 @property Connection * connection;
 @property Conference * conference;
+@property NSString * roomName;
+@property NSMutableArray * localTracks;
+extern void UnitySendMessage(const char *, const char *, const char *);
 @end
 
 @implementation SariskaNativeiOSPlugin
@@ -33,13 +38,11 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     NSLog(@"Initialized NativeCalculationsPlugin class");
 }
 
--(void) performSampleFunction: (NSString*)token
+-(void) performSampleFunction: (NSString *) token
 {
     NSLog(@"performing sample functions");
     
     [SariskaMediaTransport initializeSdk];
-    
-    
     
     NSLog(@"initialized Sariska Media Transport yay!");
     
@@ -47,13 +50,13 @@ static SariskaNativeiOSPlugin *_sharedInstance;
         @YES, @"audio", @NO, @"video", nil];
     
     [SariskaMediaTransport createLocalTracks:options callback:^(NSMutableArray * _Nonnull tracks) {
+        self.localTracks = tracks;
     }];
     
     self.connection = [SariskaMediaTransport JitsiConnection:token roomName:@"dipak" isNightly:false];
     
     if(self.connection == NULL){
         NSLog(@"Connection is null");
-        
     }
     
     [self.connection addEventListener:@"CONNECTION_ESTABLISHED" callback:^{
@@ -73,6 +76,7 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     [self.connection connect];
 }
 
+
 -(void) createConference{
     self.conference = [self.connection jitsiConference];
     
@@ -80,12 +84,29 @@ static SariskaNativeiOSPlugin *_sharedInstance;
        //Do nothing
     }];
     
-    [self.conference addEventListener:@"TRACK_ADDED" callback0:^{
-       //Do nothing
+    [self.conference addEventListener:@"TRACK_ADDED" callback1:^(id _Nonnull p) {
+        if([p isLocal]){
+            return;
+        }
+        
+        JitsiRemoteTrack * track = p;
+        
+        if([[track getType]  isEqual: @"audio"]){
+            UnitySendMessage(GAME_OBJECT, "HandleTrackAdded", "somone");
+        }
     }];
     
-    [self.conference addEventListener:@"TRACK_REMOVED" callback0:^{
-       //Do nothing
+    
+    [self.conference addEventListener:@"TRACK_REMOVED" callback1:^(id _Nonnull p){
+        if([p isLocal]){
+            return;
+        }
+        
+        JitsiRemoteTrack * track = p;
+        
+        if([[track getType]  isEqual: @"audio"]){
+            UnitySendMessage(GAME_OBJECT, "HandleTrackRemoved", "somone");
+        }
     }];
     
     [self.conference addEventListener:@"CONFERENCE_LEFT" callback0:^{
@@ -98,10 +119,33 @@ static SariskaNativeiOSPlugin *_sharedInstance;
 @end
 
 extern "C"{
-void initializeSariskaMediaTransport(){
-        NSLog(@"We are in iOS from Unity");
-    NSString * token = @"eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmYjc1MTJjZjgzYzdkYTRjMjM0Y2QzYWEyYWViOTUzMGNlZmUwMDg1YzRiZjljYzgwY2U5YmQ5YmRiNjA3ZjciLCJ0eXAiOiJKV1QifQ.eyJjb250ZXh0Ijp7InVzZXIiOnsiaWQiOiJseDVudnc2dyIsImF2YXRhciI6IiMwRkU4MkEiLCJuYW1lIjoiZGlwc2Rkc2QifSwiZ3JvdXAiOiIxIn0sInN1YiI6InVhdG5jb2U1djcybG5vaGxud2dxdjgiLCJyb29tIjoiKiIsImlhdCI6MTY1ODg1NDE5NSwibmJmIjoxNjU4ODU0MTk1LCJpc3MiOiJzYXJpc2thIiwiYXVkIjoibWVkaWFfbWVzc2FnaW5nX2NvLWJyb3dzaW5nIiwiZXhwIjoxNjU5MDI2OTk1fQ.heOmSfRvwpy9GVS5lJle_dOVIh_TR-jGFpwIJIOsTQSL1sjfP0-A9VON13Y903_lI5_Pz6Kdk4fMG9VMj4laJiDGtqWICQ09nnhS1yqoBMY5pOITo8tfn5ZDm9ZZlggcZTjrds0QcJfQvDL612O9e2AQ-xRg3eJST5gYDTbTzNLItDMbVKrnDyTEeWR4dTttkCD8aoo51p1VT1aS619rMEZ2KANsg3zImmrswZNQqEFohZVndhaJVQhwUkWObu4txuqvr2cIpdD9lkaN26Q73aRABo1vrLPnWYEP_n8NLzr-MZguY3UooldoZT9C6Zy5NqaIwU5Oi7iL3N1IoKMruQ";
-        [[SariskaNativeiOSPlugin sharedInstance] performSampleFunction:token];
+    void initializeSariskaMediaTransportAndStartCall(const char* token){
+        NSLog(@"we are in initializeSariskaMediaTransportAndStartCall");
+        [[SariskaNativeiOSPlugin sharedInstance] performSampleFunction: [NSString stringWithUTF8String:token]];
+    }
+
+    void onMuteAudioIos(){
+        
+    }
+
+    void onUnMuteAudioIos(){
+        
+    }
+
+    void onSpeakerIos(){
+        
+    }
+
+    void offSpeakerIos(){
+        
+    }
+
+    void onLogoutIos(){
+        
+    }
+
+    void onEndCallIos(){
+        
     }
     
 }

@@ -66,20 +66,20 @@ public class CallingExample : MonoBehaviour
         if (!isMuted)
         {
             muteButton.image.sprite = Resources.Load<Sprite>("unmute-audio") as Sprite;
-            ExternalTextureSecond.nativeGenericCallHandler("onMuteAudio");
+            ExternalTextureSecond.NativeGenericCallHandler("onMuteAudio");
             isMuted = true;
         }
         else
         {
             muteButton.image.sprite = Resources.Load<Sprite>("mute-audio") as Sprite;
-            ExternalTextureSecond.nativeGenericCallHandler("onUnMuteAudio");
+            ExternalTextureSecond.NativeGenericCallHandler("onUnMuteAudio");
             isMuted = false;
         }
     }
 
     public void EndCall()
     {
-        ExternalTextureSecond.nativeGenericCallHandler("onEndCall");
+        ExternalTextureSecond.NativeGenericCallHandler("onEndCall");
     }
 
     public void OnSpeakerChange()
@@ -87,13 +87,13 @@ public class CallingExample : MonoBehaviour
         if (!isSpeakerOn)
         {
             speakerButton.image.sprite = Resources.Load<Sprite>("speaker-off") as Sprite;
-            ExternalTextureSecond.nativeGenericCallHandler("onSpeaker");
+            ExternalTextureSecond.NativeGenericCallHandler("onSpeaker");
             isSpeakerOn = true;
         }
         else
         {
             speakerButton.image.sprite = Resources.Load<Sprite>("speaker") as Sprite;
-            ExternalTextureSecond.nativeGenericCallHandler("offSpeaker");
+            ExternalTextureSecond.NativeGenericCallHandler("offSpeaker");
             isSpeakerOn = false;
         }
     }
