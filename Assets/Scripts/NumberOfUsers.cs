@@ -12,7 +12,15 @@ namespace Plugins.NumberOfUsers
 
         public static bool userChanged = false;
 
-        public static Dictionary<int, string> participantList = new Dictionary<int,string>();
+        public static bool DominantSpeakerChanged = false;
+
+        public static Dictionary<string,string> participantsList = new Dictionary<string, string>();
+
+        public static string DominantSpeakerId = "";
+
+        public static Dictionary<string, string> participantList = new Dictionary<string,string>();
+
+        public static bool isLoggedOut = false;
     }
 }
 

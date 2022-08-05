@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Mute Button
   - Mute Video
+  - Speaker Button
+  - Exit Panel
   layers:
   - Default
   - TransparentFX

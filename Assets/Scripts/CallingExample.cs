@@ -4,6 +4,8 @@ using UnityEngine;
 using Plugins.ExternalTextureSecond;
 using System;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 
 public class CallingExample : MonoBehaviour
@@ -13,9 +15,13 @@ public class CallingExample : MonoBehaviour
 
     public GameObject speakerObject;
 
+    public GameObject exitPanel;
+
     public Button muteButton;
 
     public Button speakerButton;
+
+    public Text roomNameText;
 
     public static bool isMuted = false;
 
@@ -44,6 +50,10 @@ public class CallingExample : MonoBehaviour
 
     void Start()
     {
+        roomNameText = GameObject.Find("RoomName").GetComponent<Text>();
+
+        roomNameText.text = SwitchScene.InputRoomName;
+
         try
         {
             Debug.Log("Calling Example Started");
@@ -79,7 +89,23 @@ public class CallingExample : MonoBehaviour
 
     public void EndCall()
     {
+        if(exitPanel!= null)
+        {
+            exitPanel.SetActive(true);
+        }
+        
+    }
+
+    public void EndMeeting()
+    {
         ExternalTextureSecond.NativeGenericCallHandler("onEndCall");
+    }
+
+    public void onLogOut()
+    {
+        
+        ExternalTextureSecond.NativeGenericCallHandler("onLogout");
+        SceneManager.LoadScene(sceneName: "LandingPage");
     }
 
     public void OnSpeakerChange()

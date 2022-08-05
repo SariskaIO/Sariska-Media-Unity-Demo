@@ -8,12 +8,13 @@ char const *GAME_OBJECT = "PluginBridge";
 @property Conference * conference;
 @property NSString * roomName;
 @property NSMutableArray * localTracks;
-extern void UnitySendMessage(const char *, const char *, const char *);
 @end
 
 @implementation SariskaNativeiOSPlugin
 
 static SariskaNativeiOSPlugin *_sharedInstance;
+
+
 
 +(SariskaNativeiOSPlugin*)sharedInstance
 {
@@ -27,6 +28,7 @@ static SariskaNativeiOSPlugin *_sharedInstance;
 -(id)init
 {
     self = [super init];
+
     if (self)
         [self initHelper];
     return self;
@@ -59,11 +61,12 @@ static SariskaNativeiOSPlugin *_sharedInstance;
         NSLog(@"Connection is null");
     }
     
+    __weak SariskaNativeiOSPlugin *weakSelf = self;
+    
     [self.connection addEventListener:@"CONNECTION_ESTABLISHED" callback:^{
         NSLog(@"Inside the Connection Established Callback");
+        [weakSelf createConference];
     }];
-    
-    [self createConference];
     
     [self.connection addEventListener:@"CONNECTION_FAILED" callback:^{
         NSLog(@"Inside the Connection Failed Callback");
@@ -80,32 +83,35 @@ static SariskaNativeiOSPlugin *_sharedInstance;
 -(void) createConference{
     self.conference = [self.connection jitsiConference];
     
+    NSLog(@"We are in create conference");
+    
+    __weak SariskaNativeiOSPlugin *weakSelf = self;
+    
     [self.conference addEventListener:@"CONFERENCE_JOINED" callback0:^{
-       //Do nothing
+        for (JitsiLocalTrack * track in weakSelf.localTracks) {
+            [weakSelf.conference addTrack:track];
+        }
     }];
     
     [self.conference addEventListener:@"TRACK_ADDED" callback1:^(id _Nonnull p) {
-        if([p isLocal]){
-            return;
-        }
-        
-        JitsiRemoteTrack * track = p;
-        
-        if([[track getType]  isEqual: @"audio"]){
-            UnitySendMessage(GAME_OBJECT, "HandleTrackAdded", "somone");
+        JitsiRemoteTrack *track = p;
+        if([track.getType isEqual:@"audio"]){
+            NSLog(@"In the track added");
+            UnitySendMessage(GAME_OBJECT, "HandleParticipantName", "dipak");
+            UnitySendMessage(GAME_OBJECT, "HandleTrackAdded", [track.getParticipantId UTF8String]);
         }
     }];
     
+    [self.conference addEventListener:@"DOMINANT_SPEAKER_CHANGED" callback1:^(id _Nonnull p) {
+        NSLog(@"Dominant Speaker has changed");
+        UnitySendMessage(GAME_OBJECT, "HandleDominantSpeakerChanged", [p UTF8String]);
+    }];
     
     [self.conference addEventListener:@"TRACK_REMOVED" callback1:^(id _Nonnull p){
-        if([p isLocal]){
-            return;
-        }
-        
-        JitsiRemoteTrack * track = p;
-        
-        if([[track getType]  isEqual: @"audio"]){
-            UnitySendMessage(GAME_OBJECT, "HandleTrackRemoved", "somone");
+        JitsiRemoteTrack *track = p;
+        if([track.getType isEqual:@"audio"]){
+            NSLog(@"The track removed is: %@", track.getParticipantId);
+            UnitySendMessage(GAME_OBJECT, "HandleTrackRemoved", [track.getParticipantId UTF8String]);
         }
     }];
     
@@ -114,6 +120,39 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     }];
     
     [self.conference join];
+}
+
+-(void) muteLocalAudio{
+    for (JitsiLocalTrack *track in self.localTracks) {
+        if([[track getType] isEqual:@"audio"]){
+            [track mute];
+        }
+    }
+}
+
+-(void) unMuteLocalAudio{
+    for (JitsiLocalTrack *track in self.localTracks) {
+        if([[track getType] isEqual:@"audio"]){
+            [track unmute];
+        }
+    }
+}
+
+-(void) logout{
+    __weak SariskaNativeiOSPlugin *weakSelf = self;
+    if(self.conference != NULL){
+        [weakSelf.conference leave];
+    }
+    [self.connection disconnect];
+}
+
+-(void) endCall{
+    __weak SariskaNativeiOSPlugin *weakSelf = self;
+    if(self.conference != NULL){
+        [weakSelf.conference leave];
+    }
+    [self.connection disconnect];
+    exit(-1);
 }
 
 @end
@@ -125,27 +164,41 @@ extern "C"{
     }
 
     void onMuteAudioIos(){
-        
+        [[SariskaNativeiOSPlugin sharedInstance] muteLocalAudio];
     }
 
     void onUnMuteAudioIos(){
-        
+        [[SariskaNativeiOSPlugin sharedInstance] unMuteLocalAudio];
     }
 
     void onSpeakerIos(){
-        
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        try {
+            [session setCategory:AVAudioSessionCategoryPlayAndRecord error:NULL];
+        } catch (NSException * ex) {
+            //do nothing
+        }
+        [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:NULL];
     }
 
     void offSpeakerIos(){
-        
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        try {
+            [session setCategory:AVAudioSessionCategoryPlayAndRecord error:NULL];
+        } catch (NSException * ex) {
+            //do nothing
+        }
+        [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:NULL];
     }
+        
 
     void onLogoutIos(){
-        
+        [[SariskaNativeiOSPlugin sharedInstance] logout];
     }
 
     void onEndCallIos(){
-        
+        [[SariskaNativeiOSPlugin sharedInstance] endCall];
     }
     
 }
+

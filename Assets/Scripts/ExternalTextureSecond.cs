@@ -21,7 +21,7 @@ namespace Plugins.ExternalTextureSecond
 
         private static AndroidJavaObject androidJavaNativeCalculation;
 
-        private static int numberOfUsers = 1;
+        private static int numberOfUsers = 0;
 
 #if UNITY_IOS
         [DllImport("__Internal")]
@@ -112,25 +112,45 @@ namespace Plugins.ExternalTextureSecond
 
         private class NativeCallbackHandler : MonoBehaviour
         {
+            string id;
+            string nameParticipant;
+
+            private void HandleParticipantName(string participantName)
+            {
+                nameParticipant = participantName;
+            }
 
             private void HandleTrackAdded(string participantId)
-            {
-                numberOfUsers = numberOfUsers + 1;
-                NumberOfUsers.NumberOfUsers.numberOfUsers = numberOfUsers;
+            {   
+                id = participantId;
+                
+                if (NumberOfUsers.NumberOfUsers.participantsList.ContainsKey(participantId))
+                {
+                    return;
+                }
+                NumberOfUsers.NumberOfUsers.participantsList.Add(participantId, nameParticipant);
+                Debug.Log("Participant ID is: " + participantId);
+                Debug.Log("Participant Name is: " + nameParticipant);
                 NumberOfUsers.NumberOfUsers.userChanged = true;
             }
 
             private void HandleTrackRemoved(string participantId)
             {
-                numberOfUsers = numberOfUsers - 1;
-                NumberOfUsers.NumberOfUsers.numberOfUsers = numberOfUsers;
+                NumberOfUsers.NumberOfUsers.participantsList.Remove(participantId);
                 NumberOfUsers.NumberOfUsers.userChanged = true;
             }
 
-            private void AddLocalParticipant(string participantId)
+            private void HandleDominantSpeakerChanged(string participantId)
             {
-                NumberOfUsers.NumberOfUsers.participantList.Add(0, participantId);
+                Debug.Log("Dominant Speaker ID is: "+ participantId);
+                NumberOfUsers.NumberOfUsers.DominantSpeakerId = participantId;
+                NumberOfUsers.NumberOfUsers.userChanged = true;
             }
+        }
+
+        public static void clearParticipantsList()
+        {
+            NumberOfUsers.NumberOfUsers.participantsList.Clear();
         }
 
 
@@ -139,6 +159,10 @@ namespace Plugins.ExternalTextureSecond
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
+                    if(onMethodCalled == "onLogout")
+                    {
+                        clearParticipantsList();
+                    }
                     androidJavaNativeCalculation.Call(onMethodCalled);
                     break;
                 case RuntimePlatform.IPhonePlayer:
