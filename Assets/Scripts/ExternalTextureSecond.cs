@@ -6,9 +6,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Runtime.InteropServices;
 using Plugins.NumberOfUsers;
+using AOT;
 
 namespace Plugins.ExternalTextureSecond
+
 {
+    delegate void MyFuncType();
+
     public static class ExternalTextureSecond
     {
         private static AndroidJavaObject mGLTexCtrl;
@@ -52,6 +56,22 @@ namespace Plugins.ExternalTextureSecond
         [DllImport("__Internal")]
 #endif
         private static extern void onEndCallIos(); //External native method
+
+        delegate void MyFuncType(int someNumber);
+
+        [MonoPInvokeCallback(typeof(MyFuncType))]
+
+        static void MyFunction(int someNumber) {
+            Debug.Log("someNumber: " + someNumber);
+            Debug.Log("Behnchod yhi hoon mei");
+        }
+
+        static MyFuncType Handle = MyFunction;
+
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        static extern void RegisterCallback(MyFuncType Handle);
 
         private class PlatformNotSupportedException : Exception
         {
@@ -103,6 +123,7 @@ namespace Plugins.ExternalTextureSecond
                 case RuntimePlatform.IPhonePlayer:
                     Debug.Log("Inside the Iphone Player");
                     initializeSariskaMediaTransportAndStartCall(token);
+                    RegisterCallback(MyFunction);
                     break;
                 default:
                     throw new PlatformNotSupportedException();

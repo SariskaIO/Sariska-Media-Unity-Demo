@@ -1,20 +1,23 @@
 
 #import <sariska/sariska.h>
-#import "UnityForwardDecls.h"
+#import "SariskaRTCVideoRenderer.h"
+
+typedef void (*MyFuncType)(int someNumber);
 
 char const *GAME_OBJECT = "PluginBridge";
 @interface SariskaNativeiOSPlugin : NSObject
 @property Connection * connection;
 @property Conference * conference;
+@property SariskaRTCVideoRenderer * videoRenderer ;
 @property NSString * roomName;
+@property RTCVideoView *someView;
+@property NSTimer *timer;
 @property NSMutableArray * localTracks;
 @end
 
 @implementation SariskaNativeiOSPlugin
 
 static SariskaNativeiOSPlugin *_sharedInstance;
-
-
 
 +(SariskaNativeiOSPlugin*)sharedInstance
 {
@@ -28,7 +31,7 @@ static SariskaNativeiOSPlugin *_sharedInstance;
 -(id)init
 {
     self = [super init];
-
+    self.videoRenderer = [[SariskaRTCVideoRenderer alloc] init];
     if (self)
         [self initHelper];
     return self;
@@ -46,10 +49,17 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     
     [SariskaMediaTransport initializeSdk];
     
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0
+        target:self
+        selector:@selector(someThing)
+        userInfo:nil
+        repeats:YES];
+    
+    
     NSLog(@"initialized Sariska Media Transport yay!");
     
     NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-        @YES, @"audio", @NO, @"video", nil];
+        @YES, @"audio", @YES, @"video", nil];
     
     [SariskaMediaTransport createLocalTracks:options callback:^(NSMutableArray * _Nonnull tracks) {
         self.localTracks = tracks;
@@ -79,6 +89,17 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     [self.connection connect];
 }
 
+-(void) someThing{
+    NSLog(@"HEy Jude");
+    RTCVideoTrack *localTrack = [self.someView getVideoTrack];
+    if(localTrack != NULL){
+        NSLog(@"HEy Jude localTrack is not null");
+        [localTrack addRenderer:self.videoRenderer];
+        [self.timer invalidate];
+    }else{
+        return;
+    }
+}
 
 -(void) createConference{
     self.conference = [self.connection jitsiConference];
@@ -93,12 +114,12 @@ static SariskaNativeiOSPlugin *_sharedInstance;
         }
     }];
     
+    
     [self.conference addEventListener:@"TRACK_ADDED" callback1:^(id _Nonnull p) {
         JitsiRemoteTrack *track = p;
-        if([track.getType isEqual:@"audio"]){
-            NSLog(@"In the track added");
-            UnitySendMessage(GAME_OBJECT, "HandleParticipantName", "dipak");
-            UnitySendMessage(GAME_OBJECT, "HandleTrackAdded", [track.getParticipantId UTF8String]);
+        if([track.getType isEqual:@"video"]){
+            NSLog(@"In the track video");
+            weakSelf.someView = track.render;
         }
     }];
     
@@ -155,6 +176,10 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     exit(-1);
 }
 
+-(void) setRender:(MyFuncType) func{
+    [self.videoRenderer setRenderFunction:func];
+}
+
 @end
 
 extern "C"{
@@ -199,6 +224,9 @@ extern "C"{
     void onEndCallIos(){
         [[SariskaNativeiOSPlugin sharedInstance] endCall];
     }
-    
+
+    void RegisterCallback(MyFuncType func) {
+        [[SariskaNativeiOSPlugin sharedInstance] setRender:func];
+    }
 }
 
