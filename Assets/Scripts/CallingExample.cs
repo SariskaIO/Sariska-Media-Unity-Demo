@@ -19,6 +19,10 @@ public class CallingExample : MonoBehaviour
 
     public Button muteButton;
 
+    private Texture2D localTexture2D;
+
+    [SerializeField] private RawImage localImage;
+
     public Button speakerButton;
 
     public Text roomNameText;
@@ -54,6 +58,16 @@ public class CallingExample : MonoBehaviour
 
         roomNameText.text = SwitchScene.InputRoomName;
 
+        localTexture2D = new Texture2D(720, 1024, TextureFormat.RGBA32, false)
+        {
+            filterMode = FilterMode.Point
+        };
+
+        localTexture2D.Apply();
+
+        localImage.texture = localTexture2D;
+        //localImage.texture = localTexture2D;
+
         try
         {
             Debug.Log("Calling Example Started");
@@ -68,7 +82,16 @@ public class CallingExample : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(ExternalTextureSecond.videoFrameData == null)
+        {
+            return;
+        }
+        else
+        {
+            localTexture2D.LoadRawTextureData(ExternalTextureSecond.videoFrameData);
+            localTexture2D.Apply();
+        }
+
     }
 
     public void MuteUnMuteAudio()

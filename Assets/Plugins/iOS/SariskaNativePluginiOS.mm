@@ -2,7 +2,7 @@
 #import <sariska/sariska.h>
 #import "SariskaRTCVideoRenderer.h"
 
-typedef void (*MyFuncType)(int someNumber);
+typedef void (*MyFuncType)(const uint8_t * someNumber, int length);
 
 char const *GAME_OBJECT = "PluginBridge";
 @interface SariskaNativeiOSPlugin : NSObject

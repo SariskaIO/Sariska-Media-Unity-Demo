@@ -8,12 +8,13 @@ using System.Runtime.InteropServices;
 using Plugins.NumberOfUsers;
 using AOT;
 
+
 namespace Plugins.ExternalTextureSecond
 
 {
     delegate void MyFuncType();
 
-    public static class ExternalTextureSecond
+    public unsafe static class ExternalTextureSecond
     {
         private static AndroidJavaObject mGLTexCtrl;
 
@@ -26,6 +27,13 @@ namespace Plugins.ExternalTextureSecond
         private static AndroidJavaObject androidJavaNativeCalculation;
 
         private static int numberOfUsers = 0;
+
+        [SerializeField] private static RawImage localImage;
+
+        private static GameObject someObject;
+
+        public static byte[] videoFrameData;
+
 
 #if UNITY_IOS
         [DllImport("__Internal")]
@@ -57,13 +65,23 @@ namespace Plugins.ExternalTextureSecond
 #endif
         private static extern void onEndCallIos(); //External native method
 
-        delegate void MyFuncType(int someNumber);
-
+        delegate void MyFuncType(byte* byteArray, int length);
         [MonoPInvokeCallback(typeof(MyFuncType))]
+////////////////////////////////////////////////////////////////////////////////
+        static void MyFunction(byte* byteArray, int length) {
+            //GCHandle pinnedArray = GCHandle.Alloc(videoFrameData, GCHandleType.Pinned);
+            //IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+            //Marshal.Copy( byteArray,0,pointer, length );
 
-        static void MyFunction(int someNumber) {
-            Debug.Log("someNumber: " + someNumber);
-            Debug.Log("Behnchod yhi hoon mei");
+            //pinnedArray.Free();
+            // (height * width * 4)
+            byte[] someByte = new byte[2949120];
+            //videoFrameData = new byte[length];
+            Marshal.Copy((IntPtr)byteArray, someByte, 0, 2949120);
+            Debug.Log("Length of someByte: " + someByte.Length.ToString());
+            videoFrameData = someByte;
+            //Debug.Log("The lenght of the array is: " + byteArray[20]);
+            //Marshal.Release((IntPtr)byteArray);
         }
 
         static MyFuncType Handle = MyFunction;

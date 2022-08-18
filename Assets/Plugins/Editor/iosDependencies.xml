@@ -6,6 +6,8 @@
             <source>https://github.com/SariskaIO/sariska-ios-sdk-releases</source>
         </sources>
     </iosPod>
+    <iosPod name="libyuv-iOS" addToAllTargets="false">
+        </iosPod>
     </iosPods>
     <androidPackages>
         <repositories>
