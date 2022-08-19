@@ -58,7 +58,7 @@ public class CallingExample : MonoBehaviour
 
         roomNameText.text = SwitchScene.InputRoomName;
 
-        localTexture2D = new Texture2D(720, 1024, TextureFormat.RGBA32, false)
+        localTexture2D = new Texture2D(720, 1024, TextureFormat.BGRA32, false)
         {
             filterMode = FilterMode.Point
         };

@@ -69,14 +69,7 @@ namespace Plugins.ExternalTextureSecond
         [MonoPInvokeCallback(typeof(MyFuncType))]
 ////////////////////////////////////////////////////////////////////////////////
         static void MyFunction(byte* byteArray, int length) {
-            //GCHandle pinnedArray = GCHandle.Alloc(videoFrameData, GCHandleType.Pinned);
-            //IntPtr pointer = pinnedArray.AddrOfPinnedObject();
-            //Marshal.Copy( byteArray,0,pointer, length );
-
-            //pinnedArray.Free();
-            // (height * width * 4)
             byte[] someByte = new byte[2949120];
-            //videoFrameData = new byte[length];
             Marshal.Copy((IntPtr)byteArray, someByte, 0, 2949120);
             Debug.Log("Length of someByte: " + someByte.Length.ToString());
             videoFrameData = someByte;
