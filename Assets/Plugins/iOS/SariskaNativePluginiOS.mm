@@ -2,16 +2,19 @@
 #import <sariska/sariska.h>
 #import "SariskaRTCVideoRenderer.h"
 
-typedef void (*MyFuncType)(const uint8_t * someNumber, int length);
+typedef void (*RenderFunctionDelegate)(const uint8_t * data, int width, int height);
 
 char const *GAME_OBJECT = "PluginBridge";
 @interface SariskaNativeiOSPlugin : NSObject
 @property Connection * connection;
 @property Conference * conference;
-@property SariskaRTCVideoRenderer * videoRenderer ;
+@property SariskaRTCVideoRenderer * videoRendererLocal ;
+@property SariskaRTCVideoRenderer * videoRendererRemote;
 @property NSString * roomName;
-@property RTCVideoView *someView;
-@property NSTimer *timer;
+@property RTCVideoView *localVideoView;
+@property RTCVideoView *remoteVideoView;
+@property NSTimer *localtimer;
+@property NSTimer *remotetimer;
 @property NSMutableArray * localTracks;
 @end
 
@@ -31,7 +34,8 @@ static SariskaNativeiOSPlugin *_sharedInstance;
 -(id)init
 {
     self = [super init];
-    self.videoRenderer = [[SariskaRTCVideoRenderer alloc] init];
+    self.videoRendererLocal = [[SariskaRTCVideoRenderer alloc] init];
+    self.videoRendererRemote = [[SariskaRTCVideoRenderer alloc] init];
     if (self)
         [self initHelper];
     return self;
@@ -49,12 +53,17 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     
     [SariskaMediaTransport initializeSdk];
     
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0
+    self.localtimer = [NSTimer scheduledTimerWithTimeInterval:1.0
         target:self
-        selector:@selector(someThing)
+        selector:@selector(addRendererToLocalTrack)
         userInfo:nil
         repeats:YES];
     
+    self.remotetimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+        target:self
+        selector:@selector(addRendererToRemoteTrack)
+        userInfo:nil
+        repeats:YES];
     
     NSLog(@"initialized Sariska Media Transport yay!");
     
@@ -62,7 +71,13 @@ static SariskaNativeiOSPlugin *_sharedInstance;
         @YES, @"audio", @YES, @"video", nil];
     
     [SariskaMediaTransport createLocalTracks:options callback:^(NSMutableArray * _Nonnull tracks) {
+        __weak SariskaNativeiOSPlugin *weakSelf = self;
         self.localTracks = tracks;
+        for (JitsiLocalTrack *localTrack in tracks) {
+            if([[localTrack getType] isEqual:@"video"]){
+                weakSelf.localVideoView = localTrack.render;
+            }
+        }
     }];
     
     self.connection = [SariskaMediaTransport JitsiConnection:token roomName:@"dipak" isNightly:false];
@@ -89,16 +104,26 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     [self.connection connect];
 }
 
--(void) someThing{
-    NSLog(@"HEy Jude");
-    RTCVideoTrack *localTrack = [self.someView getVideoTrack];
-    if(localTrack != NULL){
-        NSLog(@"HEy Jude localTrack is not null");
-        [localTrack addRenderer:self.videoRenderer];
-        [self.timer invalidate];
+-(void) addRendererToLocalTrack{
+    RTCVideoTrack *track = [self.localVideoView getVideoTrack];
+    if(track != NULL){
+        [track addRenderer:self.videoRendererLocal];
+        [self.localtimer invalidate];
     }else{
         return;
     }
+}
+
+-(void) addRendererToRemoteTrack{
+    NSLog(@"timer render");
+   RTCVideoTrack *remoteTrack = [self.remoteVideoView getVideoTrack];
+   if(remoteTrack != NULL){
+       NSLog(@"Remote track is not null anymore");
+       [remoteTrack addRenderer:self.videoRendererRemote];
+       [self.remotetimer invalidate];
+   }else{
+       return;
+   }
 }
 
 -(void) createConference{
@@ -117,9 +142,22 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     
     [self.conference addEventListener:@"TRACK_ADDED" callback1:^(id _Nonnull p) {
         JitsiRemoteTrack *track = p;
-        if([track.getType isEqual:@"video"]){
-            NSLog(@"In the track video");
-            weakSelf.someView = track.render;
+        JitsiLocalTrack *localVideoTrack;
+        for (JitsiLocalTrack *localTrack in weakSelf.localTracks) {
+            if([localTrack.getType isEqual:@"video"]){
+                localVideoTrack = localTrack;
+            }
+        }
+        if([track.getType isEqual:@"audio"]){
+            return;
+        }else{
+            if([track.getStreamURL isEqual:localVideoTrack.getStreamURL]){
+                NSLog(@"This is the local video track, returning");
+                return;
+            }else{
+                NSLog(@"Rendering remote view");
+                weakSelf.remoteVideoView = track.render;
+            }
         }
     }];
     
@@ -176,8 +214,12 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     exit(-1);
 }
 
--(void) setRender:(MyFuncType) func{
-    [self.videoRenderer setRenderFunction:func];
+-(void) setLocalRender:(RenderFunctionDelegate) func{
+    [self.videoRendererLocal setRenderFunction:func];
+}
+
+-(void) setRemoteRender:(RenderFunctionDelegate) func{
+    [self.videoRendererRemote setRenderFunction:func];
 }
 
 @end
@@ -225,8 +267,15 @@ extern "C"{
         [[SariskaNativeiOSPlugin sharedInstance] endCall];
     }
 
-    void RegisterCallback(MyFuncType func) {
-        [[SariskaNativeiOSPlugin sharedInstance] setRender:func];
+    void RegisterCallbackLocal(RenderFunctionDelegate func, int isLocal) {
+        NSLog(@"Registerting Local Callback");
+        if(isLocal == 1){
+            NSLog(@"settingLocalRenderer");
+            [[SariskaNativeiOSPlugin sharedInstance] setLocalRender:func];
+        }else if(isLocal ==0){
+            NSLog(@"settingRemoteRenderer");
+            [[SariskaNativeiOSPlugin sharedInstance] setRemoteRender:func];
+        }
     }
 }
 

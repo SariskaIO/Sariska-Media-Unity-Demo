@@ -21,7 +21,11 @@ public class CallingExample : MonoBehaviour
 
     private Texture2D localTexture2D;
 
+    private Texture2D remoteTexture2D;
+
     [SerializeField] private RawImage localImage;
+
+    [SerializeField] private RawImage remoteImage;
 
     public Button speakerButton;
 
@@ -66,11 +70,18 @@ public class CallingExample : MonoBehaviour
         localTexture2D.Apply();
 
         localImage.texture = localTexture2D;
-        //localImage.texture = localTexture2D;
+
+        remoteTexture2D = new Texture2D(320, 180, TextureFormat.BGRA32, false)
+        {
+            filterMode = FilterMode.Point
+        };
+
+        remoteTexture2D.Apply();
+
+        remoteImage.texture = remoteTexture2D;
 
         try
         {
-            Debug.Log("Calling Example Started");
             ExternalTextureSecond.StartAudioCall(tokenInstance.token, roomName);
         }
         catch(Exception exception)
@@ -82,14 +93,24 @@ public class CallingExample : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(ExternalTextureSecond.videoFrameData == null)
+        if(ExternalTextureSecond.videoFrameDataLocal == null)
         {
             return;
         }
         else
         {
-            localTexture2D.LoadRawTextureData(ExternalTextureSecond.videoFrameData);
+            localTexture2D.LoadRawTextureData(ExternalTextureSecond.videoFrameDataLocal);
             localTexture2D.Apply();
+        }
+
+        if(ExternalTextureSecond.videoFrameDataRemote == null)
+        {
+            return;
+        }
+        else
+        {
+            remoteTexture2D.LoadRawTextureData(ExternalTextureSecond.videoFrameDataRemote);
+            remoteTexture2D.Apply();
         }
 
     }

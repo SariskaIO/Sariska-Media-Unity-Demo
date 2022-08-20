@@ -18,14 +18,12 @@
 #import <WebRTC/RTCYUVPlanarBuffer.h>
 #import "libyuv.h"
 
-#define SIZEOF(a) sizeof(a)/sizeof(*a)
-
 @implementation SariskaRTCVideoRenderer{
     CGSize _renderSize;
     CGSize _frameSize;
     CVPixelBufferRef _pixelBufferRef;
     RTCVideoRotation _rotation;
-    MyFuncType _someFunc;
+    RenderFunctionDelegate _renderToUnityDelegate;
 }
 
 -(instancetype)initWithSize:(CGSize)renderSize{
@@ -59,8 +57,8 @@
    // Do nothing for now
 }
 
-- (void)setRenderFunction:(MyFuncType)func{
-    _someFunc = func;
+- (void)setRenderFunction:(RenderFunctionDelegate)func{
+    _renderToUnityDelegate = func;
 }
 
 -(uint8_t*)copyI420ToCVPixelBuffer:(CVPixelBufferRef)outputPixelBuffer withFrame:(RTCVideoFrame *) frame
@@ -108,7 +106,6 @@
 #pragma mark - RTCVideoRenderer methods
 
 -(void) renderFrame:(RTCVideoFrame *)frame{
-    NSLog(@"We got the frame");
     NSDictionary *pixelAttributes = @{(id)kCVPixelBufferIOSurfacePropertiesKey : @{}};
     CVPixelBufferCreate(kCFAllocatorDefault,
                                 frame.width, frame.height,
@@ -116,15 +113,11 @@
                                 (__bridge CFDictionaryRef)(pixelAttributes), &_pixelBufferRef);
     
     uint8_t* dst = [self copyI420ToCVPixelBuffer:_pixelBufferRef withFrame:frame];
-    
-    
-    NSLog(@"the dst is %hhu",*(dst+20));
-    
     if(dst == NULL){
         NSLog(@"The RGB data is nill");
     }
-    if(_someFunc != NULL){
-        _someFunc(dst, 5);
+    if(_renderToUnityDelegate != NULL){
+        _renderToUnityDelegate(dst, frame.width, frame.height);
     }
     CVPixelBufferRelease(_pixelBufferRef);
 }

@@ -10,7 +10,7 @@
 #import <WebRTC/RTCVideoFrame.h>
 #import <WebRTC/RTCVideoTrack.h>
 
-typedef void (*MyFuncType)(const uint8_t * someNumber, int length);
+typedef void (*RenderFunctionDelegate)(const uint8_t * someNumber, int width, int height);
 
 @interface SariskaRTCVideoRenderer : NSObject<RTCVideoRenderer>
 
@@ -24,6 +24,6 @@ typedef void (*MyFuncType)(const uint8_t * someNumber, int length);
 
 - (void)dispose;
 
-- (void)setRenderFunction:(MyFuncType) func;
+- (void)setRenderFunction:(RenderFunctionDelegate) func;
 
 @end

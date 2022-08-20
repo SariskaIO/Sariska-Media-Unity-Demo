@@ -12,7 +12,6 @@ using AOT;
 namespace Plugins.ExternalTextureSecond
 
 {
-    delegate void MyFuncType();
 
     public unsafe static class ExternalTextureSecond
     {
@@ -32,7 +31,13 @@ namespace Plugins.ExternalTextureSecond
 
         private static GameObject someObject;
 
-        public static byte[] videoFrameData;
+        public static byte[] videoFrameDataLocal;
+
+        public static byte[] videoFrameDataRemote;
+
+        public static int remoteWidth = 0;
+
+        public static int remoteHeight = 0;
 
 
 #if UNITY_IOS
@@ -65,24 +70,32 @@ namespace Plugins.ExternalTextureSecond
 #endif
         private static extern void onEndCallIos(); //External native method
 
-        delegate void MyFuncType(byte* byteArray, int length);
-        [MonoPInvokeCallback(typeof(MyFuncType))]
-////////////////////////////////////////////////////////////////////////////////
-        static void MyFunction(byte* byteArray, int length) {
-            byte[] someByte = new byte[2949120];
-            Marshal.Copy((IntPtr)byteArray, someByte, 0, 2949120);
-            Debug.Log("Length of someByte: " + someByte.Length.ToString());
-            videoFrameData = someByte;
-            //Debug.Log("The lenght of the array is: " + byteArray[20]);
-            //Marshal.Release((IntPtr)byteArray);
+        delegate void MyFuncTypeLocal(byte* byteArray, int width, int height);
+
+        [MonoPInvokeCallback(typeof(MyFuncTypeLocal))]
+        static void LocalRenderingDelegate(byte* byteArray, int width, int height)
+        {
+            byte[] streamByteData = new byte[width * height * 4];
+            Marshal.Copy((IntPtr)byteArray, streamByteData, 0, width * height * 4);
+            videoFrameDataLocal = streamByteData;
         }
 
-        static MyFuncType Handle = MyFunction;
+        delegate void MyFuncTypeRemote(byte* byteArray, int width, int height);
+        [MonoPInvokeCallback(typeof(MyFuncTypeLocal))]
+        static void RemoteRenderingDelegate(byte* byteArray, int width, int height)
+        {
+            remoteWidth = width;
+            remoteHeight = height;
+            byte[] streamByteData = new byte[width * height * 4];
+            Marshal.Copy((IntPtr)byteArray, streamByteData, 0, width * height * 4);
+            Debug.Log("Length of streamByteData Remote: " + (width * height * 4).ToString());
+            videoFrameDataRemote = streamByteData;
+        }
 
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        static extern void RegisterCallback(MyFuncType Handle);
+        static extern void RegisterCallbackLocal(MyFuncTypeLocal handler, int isLocal); //External native method
 
         private class PlatformNotSupportedException : Exception
         {
@@ -104,13 +117,9 @@ namespace Plugins.ExternalTextureSecond
             {
                 case RuntimePlatform.Android:
                     var androidJavaUnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-
                     AndroidJavaObject currentActivityObject = androidJavaUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-
                     AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass(JAVA_OBJECT_NAME);
-
                     androidJavaNativeCalculation = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
-
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
@@ -134,11 +143,12 @@ namespace Plugins.ExternalTextureSecond
                 case RuntimePlatform.IPhonePlayer:
                     Debug.Log("Inside the Iphone Player");
                     initializeSariskaMediaTransportAndStartCall(token);
-                    RegisterCallback(MyFunction);
+                    RegisterCallbackLocal(LocalRenderingDelegate, 1);
+                    RegisterCallbackLocal(RemoteRenderingDelegate, 0);
+                    Debug.Log("After Remote Callback");
                     break;
                 default:
                     throw new PlatformNotSupportedException();
-
             }
         }
 
