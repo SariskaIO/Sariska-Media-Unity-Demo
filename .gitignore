@@ -54,6 +54,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+iosBuild*
 
 v0.0.1_BurstDebugInformation_DoNotShip
 

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dependencies>
     <iosPods>
-        <iosPod name="sariska-media-transport" addToAllTargets="false">
+        <iosPod name="sariska-media-transport-ios" addToAllTargets="false">
         <sources>
             <source>https://github.com/SariskaIO/sariska-ios-sdk-releases</source>
         </sources>
     </iosPod>
+    <iosPod name="libyuv-iOS" addToAllTargets="false">
+        </iosPod>
     </iosPods>
     <androidPackages>
         <repositories>

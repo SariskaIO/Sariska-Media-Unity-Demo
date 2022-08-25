@@ -9,7 +9,7 @@
     }
     }
         maven {
-            url "https://maven.pkg.github.com/SariskaIO/maven-repository" // Assets/Plugins/Editor/iosDependencies.xml:13
+            url "https://maven.pkg.github.com/SariskaIO/maven-repository" // Assets/Plugins/Editor/iosDependencies.xml:15
         }
     }
 }
@@ -20,7 +20,7 @@ apply plugin: 'com.android.library'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 // Android Resolver Dependencies Start
-    implementation 'io.sariska:sariska-media-transport:5.2.1-exp' // Assets/Plugins/Editor/iosDependencies.xml:14
+    implementation 'io.sariska:sariska-media-transport:5.2.1-exp' // Assets/Plugins/Editor/iosDependencies.xml:16
 // Android Resolver Dependencies End
 **DEPS**}
 

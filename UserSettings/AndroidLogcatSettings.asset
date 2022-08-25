@@ -1,9 +1,9 @@
 {
     "m_SelectedDeviceId": "RZ8N90NGFZM",
     "m_SelectedPackage": {
-        "deviceId": "",
-        "name": "",
-        "processId": 0,
+        "deviceId": "RZ8N90NGFZM",
+        "name": "io.sariska.unitydemo",
+        "processId": 17524,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,37 +11,55 @@
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 11214,
+            "processId": 17394,
+            "exited": true
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "com.google.android.youtube",
+            "processId": 12882,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 16892,
             "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 26087,
+            "processId": 20554,
             "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 28941,
+            "processId": 23247,
             "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 29633,
+            "processId": 30869,
             "exited": true
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 30659,
-            "exited": true
+            "processId": 32209,
+            "exited": false
         },
         {
             "deviceId": "RZ8N90NGFZM",
             "name": "io.sariska.unitydemo",
-            "processId": 31223,
+            "processId": 16876,
+            "exited": false
+        },
+        {
+            "deviceId": "RZ8N90NGFZM",
+            "name": "io.sariska.unitydemo",
+            "processId": 17524,
             "exited": false
         }
     ],
