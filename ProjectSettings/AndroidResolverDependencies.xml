@@ -1,6 +1,6 @@
 <dependencies>
   <packages>
-    <package>io.sariska:sariska-media-transport:5.2.4</package>
+    <package>io.sariska:sariska-media-transport:5.2.1-exp</package>
   </packages>
   <files />
   <settings>

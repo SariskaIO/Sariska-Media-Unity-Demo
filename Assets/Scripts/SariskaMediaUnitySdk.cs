@@ -9,11 +9,10 @@ using Plugins.NumberOfUsers;
 using AOT;
 
 
-namespace Plugins.ExternalTextureSecond
-
+namespace Plugins.SariskaMediaUnitySdk
 {
 
-    public unsafe static class ExternalTextureSecond
+    public unsafe static class SariskaMediaUnitySdk
     {
         private static AndroidJavaObject mGLTexCtrl;
 
@@ -21,7 +20,7 @@ namespace Plugins.ExternalTextureSecond
 
         private static GameObject gameObject;
 
-        private const string JAVA_OBJECT_NAME = "io.sariska.sariskamediaaudiounitymodule.SariskaAudioUnityDemo";
+        private const string JAVA_OBJECT_NAME = "io.sariska.sariskamediaunityplugin.SariskaMediaUnityPlugin";
 
         private static AndroidJavaObject androidJavaNativeCalculation;
 
@@ -103,7 +102,7 @@ namespace Plugins.ExternalTextureSecond
         }
 
 
-        static ExternalTextureSecond(){
+        static SariskaMediaUnitySdk(){
 
             gameObject = new GameObject();
 
@@ -120,6 +119,7 @@ namespace Plugins.ExternalTextureSecond
                     AndroidJavaObject currentActivityObject = androidJavaUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
                     AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass(JAVA_OBJECT_NAME);
                     androidJavaNativeCalculation = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
+                    
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
@@ -133,19 +133,18 @@ namespace Plugins.ExternalTextureSecond
         }
 
         // Start is called before the first frame update
-        public static void StartAudioCall(string token, string userName)
+        public static void StartCall(string token, string rooomName, IntPtr localPointer, IntPtr remotePointer)
         {
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    androidJavaNativeCalculation.Call("startAudioCall", token, userName);
+                    androidJavaNativeCalculation.Call("setupOpenGL", token, rooomName);
+                    androidJavaNativeCalculation.Call("setupLocalStream", remotePointer.ToInt32(), localPointer.ToInt32());
                     break;
                 case RuntimePlatform.IPhonePlayer:
-                    Debug.Log("Inside the Iphone Player");
                     initializeSariskaMediaTransportAndStartCall(token);
                     RegisterCallbackLocal(LocalRenderingDelegate, 1);
                     RegisterCallbackLocal(RemoteRenderingDelegate, 0);
-                    Debug.Log("After Remote Callback");
                     break;
                 default:
                     throw new PlatformNotSupportedException();

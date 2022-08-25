@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Plugins.ExternalTextureSecond;
+using Plugins.SariskaMediaUnitySdk;
 using System;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -19,17 +19,21 @@ public class CallingExample : MonoBehaviour
 
     public Button muteButton;
 
-    private Texture2D localTexture2D;
+    private Texture2D localTexture2D; //Local Texture
 
-    private Texture2D remoteTexture2D;
+    private Texture2D remoteTexture2D; //Remote Texture
 
-    [SerializeField] private RawImage localImage;
+    [SerializeField] private RawImage localImage; // Local Texture attached to it
 
-    [SerializeField] private RawImage remoteImage;
+    [SerializeField] private RawImage remoteImage; // Remote Texture attached to it
 
     public Button speakerButton;
 
     public Text roomNameText;
+
+    private IntPtr remoteTexturePointer; //Remote texture pointer (For Android)
+
+    private IntPtr localTexturePointer; // Local texture pointer (for Android)
 
     public static bool isMuted = false;
 
@@ -45,15 +49,18 @@ public class CallingExample : MonoBehaviour
     private void Awake()
     {
         muteAudioObject = GameObject.FindWithTag("Mute Button");
+
         muteButton = muteAudioObject.GetComponent<Button>();
 
         speakerObject = GameObject.FindWithTag("Speaker Button");
+
         speakerButton = speakerObject.GetComponent<Button>();
 
         roomName = SwitchScene.InputRoomName;
+
         userName = SwitchScene.InputUserName;
 
-        tokenInstance  = TokenAPIHelp.GetSessionToken(roomName, userName);
+        tokenInstance  = TokenAPIHelp.GetSessionToken(roomName, userName); // Generate token 
     }
 
     void Start()
@@ -62,7 +69,7 @@ public class CallingExample : MonoBehaviour
 
         roomNameText.text = SwitchScene.InputRoomName;
 
-        localTexture2D = new Texture2D(720, 1024, TextureFormat.BGRA32, false)
+        localTexture2D = new Texture2D(720, 1024, TextureFormat.BGRA32, false) // Create local Texture 
         {
             filterMode = FilterMode.Point
         };
@@ -71,7 +78,9 @@ public class CallingExample : MonoBehaviour
 
         localImage.texture = localTexture2D;
 
-        remoteTexture2D = new Texture2D(320, 180, TextureFormat.BGRA32, false)
+        localTexturePointer = localTexture2D.GetNativeTexturePtr();
+        
+        remoteTexture2D = new Texture2D(320, 180, TextureFormat.BGRA32, false) // Create Remote Texture
         {
             filterMode = FilterMode.Point
         };
@@ -80,9 +89,11 @@ public class CallingExample : MonoBehaviour
 
         remoteImage.texture = remoteTexture2D;
 
+        remoteTexturePointer = remoteTexture2D.GetNativeTexturePtr();
+
         try
         {
-            ExternalTextureSecond.StartAudioCall(tokenInstance.token, roomName);
+            SariskaMediaUnitySdk.StartCall(tokenInstance.token, roomName, localTexturePointer, remoteTexturePointer);
         }
         catch(Exception exception)
         {
@@ -93,23 +104,23 @@ public class CallingExample : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(ExternalTextureSecond.videoFrameDataLocal == null)
+        if(SariskaMediaUnitySdk.videoFrameDataLocal == null)
         {
             return;
         }
         else
         {
-            localTexture2D.LoadRawTextureData(ExternalTextureSecond.videoFrameDataLocal);
+            localTexture2D.LoadRawTextureData(SariskaMediaUnitySdk.videoFrameDataLocal);
             localTexture2D.Apply();
         }
 
-        if(ExternalTextureSecond.videoFrameDataRemote == null)
+        if(SariskaMediaUnitySdk.videoFrameDataRemote == null)
         {
             return;
         }
         else
         {
-            remoteTexture2D.LoadRawTextureData(ExternalTextureSecond.videoFrameDataRemote);
+            remoteTexture2D.LoadRawTextureData(SariskaMediaUnitySdk.videoFrameDataRemote);
             remoteTexture2D.Apply();
         }
 
@@ -120,13 +131,13 @@ public class CallingExample : MonoBehaviour
         if (!isMuted)
         {
             muteButton.image.sprite = Resources.Load<Sprite>("unmute-audio") as Sprite;
-            ExternalTextureSecond.NativeGenericCallHandler("onMuteAudio");
+            SariskaMediaUnitySdk.NativeGenericCallHandler("onMuteAudio");
             isMuted = true;
         }
         else
         {
             muteButton.image.sprite = Resources.Load<Sprite>("mute-audio") as Sprite;
-            ExternalTextureSecond.NativeGenericCallHandler("onUnMuteAudio");
+            SariskaMediaUnitySdk.NativeGenericCallHandler("onUnMuteAudio");
             isMuted = false;
         }
     }
@@ -142,13 +153,13 @@ public class CallingExample : MonoBehaviour
 
     public void EndMeeting()
     {
-        ExternalTextureSecond.NativeGenericCallHandler("onEndCall");
+        SariskaMediaUnitySdk.NativeGenericCallHandler("onEndCall");
     }
 
     public void onLogOut()
     {
         
-        ExternalTextureSecond.NativeGenericCallHandler("onLogout");
+        SariskaMediaUnitySdk.NativeGenericCallHandler("onLogout");
         SceneManager.LoadScene(sceneName: "LandingPage");
     }
 
@@ -157,13 +168,13 @@ public class CallingExample : MonoBehaviour
         if (!isSpeakerOn)
         {
             speakerButton.image.sprite = Resources.Load<Sprite>("speaker-off") as Sprite;
-            ExternalTextureSecond.NativeGenericCallHandler("onSpeaker");
+            SariskaMediaUnitySdk.NativeGenericCallHandler("onSpeaker");
             isSpeakerOn = true;
         }
         else
         {
             speakerButton.image.sprite = Resources.Load<Sprite>("speaker") as Sprite;
-            ExternalTextureSecond.NativeGenericCallHandler("offSpeaker");
+            SariskaMediaUnitySdk.NativeGenericCallHandler("offSpeaker");
             isSpeakerOn = false;
         }
     }
