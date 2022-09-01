@@ -280,62 +280,16 @@ namespace Plugins.SariskaMediaUnitySdk
             
         }
 
-        public static void ToggleAudio(bool isMuted)
+        public static void MuteAudio()
         {
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    if (!isMuted)
-                    {
-                        androidJavaNativeCalculation.Call("onMuteAudio"); 
-                    }
-                    else
-                    {
-                        androidJavaNativeCalculation.Call("onUnMuteAudio");
-                    }
+                    androidJavaNativeCalculation.Call("onMuteAudio");
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
-                    if (!isMuted)
-                    {
-                        onMuteAudio();
-                    }
-                    else
-                    {
-                        onUnMuteAudio();
-                    }
-                    break;
-
-                default:
-                    throw new PlatformNotSupportedException();
-            }
-            
-        }
-
-        public static void ToggleVideo(bool isVideoMuted)
-        {
-            switch (Application.platform)
-            {
-                case RuntimePlatform.Android:
-                    if (!isVideoMuted)
-                    {
-                        androidJavaNativeCalculation.Call("onMuteVideo");
-                    }
-                    else
-                    {
-                        androidJavaNativeCalculation.Call("onUnMuteVideo");
-                    }
-                    break;
-
-                case RuntimePlatform.IPhonePlayer:
-                    if (!isVideoMuted)
-                    {
-                        onMuteVideo();
-                    }
-                    else
-                    {
-                        onUnMuteVideo();
-                    }
+                    onMuteAudio();
                     break;
 
                 default:
@@ -343,30 +297,84 @@ namespace Plugins.SariskaMediaUnitySdk
             }
         }
 
-        public static void ToggleSpeaker(bool isSpeakerMuted)
+        public static void UnMuteAudio()
         {
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    if (!isSpeakerMuted)
-                    {
-                        androidJavaNativeCalculation.Call("onSpeaker");
-                    }
-                    else
-                    {
-                        androidJavaNativeCalculation.Call("offSpeaker");
-                    }
+                    androidJavaNativeCalculation.Call("onUnMuteAudio");
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
-                    if (!isSpeakerMuted)
-                    {
-                        onSpeaker();
-                    }
-                    else
-                    {
-                        offSpeaker();
-                    }
+                    onUnMuteAudio();
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static void MuteVideo()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("onMuteVideo");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    onMuteVideo();
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static void UnMuteVideo()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("onUnMuteVideo");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    onUnMuteVideo();
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static void OnSpeaker()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("onSpeaker");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    onSpeaker();
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static void OffSpeaker()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("offSpeaker");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    offSpeaker();
                     break;
 
                 default:
@@ -410,31 +418,32 @@ namespace Plugins.SariskaMediaUnitySdk
             return partcipantCount;
         }
 
-        public static void LockUnlockRoom(bool isRoomLocked, string password)
+        public static void LockRoom(string password)
         {
-            
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    if (isRoomLocked)
-                    {
-                        androidJavaNativeCalculation.Call("unlockRoom");
-                    }
-                    else
-                    {
-                        androidJavaNativeCalculation.Call("lockRoom", password);
-                    }
+                    androidJavaNativeCalculation.Call("lockRoom", password);
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
-                    if (isRoomLocked)
-                    {
-                        unLockRoom();
-                    }
-                    else
-                    {
-                        lockRoom(password);
-                    }
+                    lockRoom(password);
+                    break;
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static void UnlockRoom()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("unLockRoom");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    unLockRoom();
                     break;
                 default:
                     throw new PlatformNotSupportedException();

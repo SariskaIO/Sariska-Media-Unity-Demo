@@ -134,13 +134,13 @@ public class CallingExample : MonoBehaviour
         if (!isMuted)
         {
             muteButton.image.sprite = Resources.Load<Sprite>("unmute-audio") as Sprite;
-            SariskaMediaUnitySdk.ToggleAudio(isMuted);
+            SariskaMediaUnitySdk.MuteAudio();
             isMuted = true;
         }
         else
         {
             muteButton.image.sprite = Resources.Load<Sprite>("mute-audio") as Sprite;
-            SariskaMediaUnitySdk.ToggleAudio(isMuted);
+            SariskaMediaUnitySdk.UnMuteAudio();
             isMuted = false;
         }
     }
