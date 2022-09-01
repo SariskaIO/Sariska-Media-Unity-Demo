@@ -7,7 +7,7 @@ import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -15,7 +15,6 @@ import android.opengl.EGLDisplay;
 import android.opengl.EGLSurface;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.os.Build;
 import android.os.Bundle;
 import android.renderscript.Allocation;
@@ -48,7 +47,7 @@ public class SariskaMediaUnityPlugin{
     private final ExecutorService mRenderThreadRemote = Executors.newFixedThreadPool(2);
     private volatile EGLContext mSharedEglContext;
     private volatile EGLConfig mSharedEglConfig;
-    private int mTextureID;
+    private int mLocalTextureID;
     private int mRemoteTextureId;
     private int mTextureWidth;
     private int mTextureHeight;
@@ -60,6 +59,7 @@ public class SariskaMediaUnityPlugin{
     private Connection connection;
     private Conference conference;
     private Context context;
+    private AudioManager audioManager;
 
 
 
@@ -86,12 +86,16 @@ public class SariskaMediaUnityPlugin{
 
     private SariskaMediaUnityPlugin(Activity unityActivity){
         this.context = unityActivity;
-        SariskaMediaTransport.initializeSdk(unityActivity.getApplication());
+        audioManager = (AudioManager) this.context.getSystemService(Context.AUDIO_SERVICE);
+        //SariskaMediaTransport.initializeSdk(unityActivity.getApplication()); //obsolete
         if (!hasPermissions(unityActivity, PERMISSIONS)) {
             ActivityCompat.requestPermissions(unityActivity, PERMISSIONS, PERMISSION_ALL);
         }
         mUnityActivity = unityActivity;
     }
+
+
+
 
     public boolean hasPermissions(Activity context, String... permissions) {
         if (context != null && permissions != null) {
@@ -104,15 +108,15 @@ public class SariskaMediaUnityPlugin{
         return true;
     }
 
-    public void setupLocalStream(int mRemoteTextureId, int mTextureID){
+    public void setupLocalStream(boolean audio, boolean video, int resolution, int mRemoteTextureId, int mLocalTextureID){
 
-        this.mTextureID = mTextureID;
+        this.mLocalTextureID = mLocalTextureID;
         this.mRemoteTextureId = mRemoteTextureId;
 
         Bundle options = new Bundle();
-        options.putBoolean("audio", true);
-        options.putBoolean("video", true);
-        options.putInt("resolution", 180);
+        options.putBoolean("audio", audio);
+        options.putBoolean("video", video);
+        options.putInt("resolution", resolution);
         Log.d(TAG, "We at LocalStream");
 
         SariskaMediaTransport.createLocalTracks(options, tracks -> {
@@ -141,7 +145,7 @@ public class SariskaMediaUnityPlugin{
                                 inData.copyFrom(nv21Data);
                                 yuvToRgbIntrinsic.setInput(inData);
                                 yuvToRgbIntrinsic.forEach(outData);
-                                updateBufferLocalStream(mTextureID, outData.getByteBuffer(), width,height);
+                                updateBufferLocalStream(mLocalTextureID, outData.getByteBuffer(), width,height);
                                 i420Buffer.release();
                                 System.gc();
                                 Runtime.getRuntime().gc();
@@ -152,17 +156,31 @@ public class SariskaMediaUnityPlugin{
             });
         });
 
-        connection = SariskaMediaTransport.JitsiConnection(token, roomName, false);
+//        connection = SariskaMediaTransport.JitsiConnection(token, roomName, false);
+//        connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
+//        connection.addEventListener("CONNECTION_FAILED", () -> {
+//        });
+//        connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
+//        });
+//        connection.connect();
+    }
+
+    public void createConnection(String roomName, String tokenFromUnity){
+        connection = SariskaMediaTransport.JitsiConnection(tokenFromUnity, roomName, false);
+
         connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
+
         connection.addEventListener("CONNECTION_FAILED", () -> {
         });
+
         connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
         });
+
         connection.connect();
     }
-    
 
     private void createConference() {
+
         conference = connection.initJitsiConference();
 
         conference.addEventListener("CONFERENCE_JOINED", () -> {
@@ -170,12 +188,15 @@ public class SariskaMediaUnityPlugin{
                 conference.addTrack(track);
             }
         });
+
         conference.addEventListener("DOMINANT_SPEAKER_CHANGED", p -> {
             String id = (String) p;
             conference.selectParticipant(id);
         });
+
         conference.addEventListener("CONFERENCE_LEFT", () -> {
         });
+
         conference.addEventListener("TRACK_ADDED", p -> {
             JitsiRemoteTrack track = (JitsiRemoteTrack) p;
             runOnUiThread(() -> {
@@ -258,10 +279,8 @@ public class SariskaMediaUnityPlugin{
         return nv21Data;
     }
 
-    public void setupOpenGL(String tokenFromUnity, String roomName)
+    public void setupOpenGL()
     {
-        this.token = tokenFromUnity;
-        this.roomName = roomName;
         //Get eglcontext and egldisplay of the unity thread
         mSharedEglContext = EGL14.eglGetCurrentContext();
         if (mSharedEglContext == EGL14.EGL_NO_CONTEXT) {
@@ -356,7 +375,7 @@ public class SariskaMediaUnityPlugin{
 
     public int getStreamTextureID(int remoteTextureId){
         this.mRemoteTextureId = remoteTextureId;
-        return mTextureID;
+        return mLocalTextureID;
     }
 
     public int getStreamTextureWidth(){
@@ -422,10 +441,21 @@ public class SariskaMediaUnityPlugin{
         localTracks.get(1).switchCamera();
     }
 
-    public void onSpeakerChanges(){
-        //need to do
+
+    public void onSpeaker(){
+        changeAudioState(true);
     }
 
+    public void offSpeaker(){
+        changeAudioState(false);
+    }
+
+    private void changeAudioState(boolean bool) {
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        audioManager.stopBluetoothSco();
+        audioManager.setBluetoothScoOn(false);
+        audioManager.setSpeakerphoneOn(bool);
+    }
 
     public void onLogout(){
         if(conference != null){
@@ -441,4 +471,38 @@ public class SariskaMediaUnityPlugin{
         connection.disconnect();
         mUnityActivity.finish();
     }
+
+    public void initializeSariskaMediaTransport(int something){
+        SariskaMediaTransport.initializeSdk(mUnityActivity.getApplication());
+    }
+
+    public void addConnectionEventListener(){
+        // To do
+    }
+
+    public void addConferenceEventListener(){
+        // To do
+    }
+
+
+    public String getDominantSpeaker(){
+        final String[] participantId = {""};
+        conference.addEventListener("DOMINANT_SPEAKER_CHANGED", id -> {
+            participantId[0] = id.toString();
+        });
+
+        return participantId[0];
+    }
+
+    public int getParticipantCount(boolean hidden){
+        return conference.getParticipantCount(hidden);
+    }
+
+    public void lockRoom(String password){
+        conference.lock(password);
+    }
+    public void unlockRoom(){
+        conference.unlock();
+    }
+
 }

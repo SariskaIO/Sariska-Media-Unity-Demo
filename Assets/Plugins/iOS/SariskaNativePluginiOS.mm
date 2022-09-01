@@ -16,6 +16,7 @@ char const *GAME_OBJECT = "PluginBridge";
 @property NSTimer *localtimer;
 @property NSTimer *remotetimer;
 @property NSMutableArray * localTracks;
+@property NSString * dominantSpeakerId;
 @end
 
 @implementation SariskaNativeiOSPlugin
@@ -47,10 +48,8 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     NSLog(@"Initialized NativeCalculationsPlugin class");
 }
 
--(void) performSampleFunction: (NSString *) token
+-(void) initializeSariskaMediaTransport
 {
-    NSLog(@"performing sample functions");
-    
     [SariskaMediaTransport initializeSdk];
     
     self.localtimer = [NSTimer scheduledTimerWithTimeInterval:1.0
@@ -67,42 +66,8 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     
     NSLog(@"initialized Sariska Media Transport yay!");
     
-    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-        @YES, @"audio", @YES, @"video", nil];
-    
-    [SariskaMediaTransport createLocalTracks:options callback:^(NSMutableArray * _Nonnull tracks) {
-        __weak SariskaNativeiOSPlugin *weakSelf = self;
-        self.localTracks = tracks;
-        for (JitsiLocalTrack *localTrack in tracks) {
-            if([[localTrack getType] isEqual:@"video"]){
-                weakSelf.localVideoView = localTrack.render;
-            }
-        }
-    }];
-    
-    self.connection = [SariskaMediaTransport JitsiConnection:token roomName:@"dipak" isNightly:false];
-    
-    if(self.connection == NULL){
-        NSLog(@"Connection is null");
-    }
-    
-    __weak SariskaNativeiOSPlugin *weakSelf = self;
-    
-    [self.connection addEventListener:@"CONNECTION_ESTABLISHED" callback:^{
-        NSLog(@"Inside the Connection Established Callback");
-        [weakSelf createConference];
-    }];
-    
-    [self.connection addEventListener:@"CONNECTION_FAILED" callback:^{
-        NSLog(@"Inside the Connection Failed Callback");
-    }];
-    
-    [self.connection addEventListener:@"CONNECTION_DISCONNECTED" callback:^{
-        NSLog(@"Inside the Connection Disconnected Callback");
-    }];
-    
-    [self.connection connect];
 }
+
 
 -(void) addRendererToLocalTrack{
     RTCVideoTrack *track = [self.localVideoView getVideoTrack];
@@ -163,7 +128,8 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     
     [self.conference addEventListener:@"DOMINANT_SPEAKER_CHANGED" callback1:^(id _Nonnull p) {
         NSLog(@"Dominant Speaker has changed");
-        UnitySendMessage(GAME_OBJECT, "HandleDominantSpeakerChanged", [p UTF8String]);
+        weakSelf.dominantSpeakerId = p;
+        //UnitySendMessage(GAME_OBJECT, "HandleDominantSpeakerChanged", [p UTF8String]);
     }];
     
     [self.conference addEventListener:@"TRACK_REMOVED" callback1:^(id _Nonnull p){
@@ -179,6 +145,55 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     }];
     
     [self.conference join];
+}
+
+-(void) setupLocalStream: (bool) audio : (bool) video : (int) resolution{
+    NSDictionary *options = NULL;
+    if(audio == TRUE && video == TRUE){
+        options = [NSDictionary dictionaryWithObjectsAndKeys:@YES, @"audio", @YES, @"video", nil];
+    }else if(audio == TRUE && video == TRUE){
+        options = [NSDictionary dictionaryWithObjectsAndKeys:@YES, @"audio", @NO, @"video", nil];
+    }else if(audio == FALSE && video == TRUE){
+        options = [NSDictionary dictionaryWithObjectsAndKeys:@NO, @"audio", @YES, @"video", nil];
+    }else{
+        options = [NSDictionary dictionaryWithObjectsAndKeys:@NO, @"audio", @NO, @"video", nil];
+    }
+    
+    [SariskaMediaTransport createLocalTracks:options callback:^(NSMutableArray * _Nonnull tracks) {
+            __weak SariskaNativeiOSPlugin *weakSelf = self;
+            self.localTracks = tracks;
+            for (JitsiLocalTrack *localTrack in tracks) {
+                if([[localTrack getType] isEqual:@"video"]){
+                    weakSelf.localVideoView = localTrack.render;
+                }
+            }
+        }];
+}
+
+-(void) createConnection: (NSString *) roomname : (NSString *) token{
+    
+        self.connection = [SariskaMediaTransport JitsiConnection:token roomName:@"dipak" isNightly:false];
+    
+        if(self.connection == NULL){
+            NSLog(@"Connection is null");
+        }
+    
+        __weak SariskaNativeiOSPlugin *weakSelf = self;
+    
+        [self.connection addEventListener:@"CONNECTION_ESTABLISHED" callback:^{
+            NSLog(@"Inside the Connection Established Callback");
+            [weakSelf createConference];
+        }];
+    
+        [self.connection addEventListener:@"CONNECTION_FAILED" callback:^{
+            NSLog(@"Inside the Connection Failed Callback");
+        }];
+    
+        [self.connection addEventListener:@"CONNECTION_DISCONNECTED" callback:^{
+            NSLog(@"Inside the Connection Disconnected Callback");
+        }];
+    
+        [self.connection connect];
 }
 
 -(void) muteLocalAudio{
@@ -222,23 +237,104 @@ static SariskaNativeiOSPlugin *_sharedInstance;
     [self.videoRendererRemote setRenderFunction:func];
 }
 
-@end
+-(NSString *) getDominantSpeaker{
+    return self.dominantSpeakerId;
+}
 
+-(NSNumber *) getParticipantCount: (bool)hidden{
+    return [self.conference getParticipantCount:hidden];
+}
+
+-(void) lockRoom:(NSString *) password{
+    [self.conference lock:password];
+}
+
+-(void) unLockRoom{
+    [self.conference unlock];
+}
+
+-(void)onSwitchCamera{
+    for (JitsiLocalTrack *track in self.localTracks) {
+        if([[track getType] isEqual:@"video"]){
+            [track switchCamera];
+        }
+    }
+}
+
+-(void) onMuteVideo{
+    for (JitsiLocalTrack *track in self.localTracks) {
+        if([[track getType] isEqual:@"video"]){
+            [track mute];
+        }
+    }
+}
+
+-(void) onUnMuteVideo{
+    for (JitsiLocalTrack *track in self.localTracks) {
+        if([[track getType] isEqual:@"video"]){
+            [track unmute];
+        }
+    }
+}
+
+
+
+@end
+//const char* token
 extern "C"{
-    void initializeSariskaMediaTransportAndStartCall(const char* token){
-        NSLog(@"we are in initializeSariskaMediaTransportAndStartCall");
-        [[SariskaNativeiOSPlugin sharedInstance] performSampleFunction: [NSString stringWithUTF8String:token]];
+    void initializeSariskaMediaTransport(){
+        NSLog(@"we are in initializeSariskaMediaTransport");
+        [[SariskaNativeiOSPlugin sharedInstance] initializeSariskaMediaTransport];
     }
 
-    void onMuteAudioIos(){
+    void setupLocalStream(bool audio, bool video, int resolution){
+        [[SariskaNativeiOSPlugin sharedInstance] setupLocalStream:audio :video :resolution];
+    }
+
+    void createConnection(const char* roomName, const char * token){
+        [[SariskaNativeiOSPlugin sharedInstance]
+            createConnection:[NSString stringWithUTF8String:roomName]
+                :[NSString stringWithUTF8String:token]];
+    }
+
+    const char * getDominantSpeaker(){
+        const char * dominantSpeaker =[[[SariskaNativeiOSPlugin sharedInstance] getDominantSpeaker] UTF8String];
+        return dominantSpeaker;
+    }
+
+    int getParticipantCount(bool hidden){
+        return [[[SariskaNativeiOSPlugin sharedInstance] getParticipantCount: hidden] intValue];
+    }
+
+    void lockRoom(const char * password){
+        [[SariskaNativeiOSPlugin sharedInstance] lockRoom:[NSString stringWithUTF8String:password]];
+    }
+
+    void unLockRoom(){
+        [[SariskaNativeiOSPlugin sharedInstance] unLockRoom];
+    }
+
+    void onSwitchCamera(){
+        [[SariskaNativeiOSPlugin sharedInstance] onSwitchCamera];
+    }
+
+    void onMuteAudio(){
         [[SariskaNativeiOSPlugin sharedInstance] muteLocalAudio];
     }
 
-    void onUnMuteAudioIos(){
+    void onUnMuteAudio(){
         [[SariskaNativeiOSPlugin sharedInstance] unMuteLocalAudio];
     }
 
-    void onSpeakerIos(){
+    void onMuteVideo(){
+        [[SariskaNativeiOSPlugin sharedInstance] onMuteVideo];
+    }
+
+    void onUnMuteVideo(){
+        [[SariskaNativeiOSPlugin sharedInstance] onUnMuteVideo];
+    }
+
+    void onSpeaker(){
         AVAudioSession *session = [AVAudioSession sharedInstance];
         try {
             [session setCategory:AVAudioSessionCategoryPlayAndRecord error:NULL];
@@ -248,7 +344,7 @@ extern "C"{
         [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:NULL];
     }
 
-    void offSpeakerIos(){
+    void offSpeaker(){
         AVAudioSession *session = [AVAudioSession sharedInstance];
         try {
             [session setCategory:AVAudioSessionCategoryPlayAndRecord error:NULL];
@@ -259,11 +355,11 @@ extern "C"{
     }
         
 
-    void onLogoutIos(){
+    void onLogout(){
         [[SariskaNativeiOSPlugin sharedInstance] logout];
     }
 
-    void onEndCallIos(){
+    void onEndCall(){
         [[SariskaNativeiOSPlugin sharedInstance] endCall];
     }
 

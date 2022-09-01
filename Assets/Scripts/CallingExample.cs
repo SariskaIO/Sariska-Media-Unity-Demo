@@ -39,8 +39,6 @@ public class CallingExample : MonoBehaviour
 
     public static bool isSpeakerOn = false;
 
-    private Token tokenInstance;
-
     public string roomName;
 
     public string userName;
@@ -59,8 +57,6 @@ public class CallingExample : MonoBehaviour
         roomName = SwitchScene.InputRoomName;
 
         userName = SwitchScene.InputUserName;
-
-        tokenInstance  = TokenAPIHelp.GetSessionToken(roomName, userName); // Generate token 
     }
 
     void Start()
@@ -93,8 +89,15 @@ public class CallingExample : MonoBehaviour
 
         try
         {
-            SariskaMediaUnitySdk.StartCall(tokenInstance.token, roomName, localTexturePointer, remoteTexturePointer);
+            //Calling SDK from here
+
+            SariskaMediaUnitySdk.InitSariskaMediaTransport();
+
+            SariskaMediaUnitySdk.SetupLocalStream(true, true, 180, localTexturePointer, remoteTexturePointer);
+
+            SariskaMediaUnitySdk.CreateConnection(roomName, userName);
         }
+
         catch(Exception exception)
         {
             Debug.LogError(exception);
@@ -131,13 +134,13 @@ public class CallingExample : MonoBehaviour
         if (!isMuted)
         {
             muteButton.image.sprite = Resources.Load<Sprite>("unmute-audio") as Sprite;
-            SariskaMediaUnitySdk.NativeGenericCallHandler("onMuteAudio");
+            SariskaMediaUnitySdk.ToggleAudio(isMuted);
             isMuted = true;
         }
         else
         {
             muteButton.image.sprite = Resources.Load<Sprite>("mute-audio") as Sprite;
-            SariskaMediaUnitySdk.NativeGenericCallHandler("onUnMuteAudio");
+            SariskaMediaUnitySdk.ToggleAudio(isMuted);
             isMuted = false;
         }
     }
@@ -153,13 +156,13 @@ public class CallingExample : MonoBehaviour
 
     public void EndMeeting()
     {
-        SariskaMediaUnitySdk.NativeGenericCallHandler("onEndCall");
+        // Do nothing for now
     }
 
     public void onLogOut()
     {
         
-        SariskaMediaUnitySdk.NativeGenericCallHandler("onLogout");
+        // Do nothing for now
         SceneManager.LoadScene(sceneName: "LandingPage");
     }
 
@@ -168,13 +171,13 @@ public class CallingExample : MonoBehaviour
         if (!isSpeakerOn)
         {
             speakerButton.image.sprite = Resources.Load<Sprite>("speaker-off") as Sprite;
-            SariskaMediaUnitySdk.NativeGenericCallHandler("onSpeaker");
+            //Do nothing for now
             isSpeakerOn = true;
         }
         else
         {
             speakerButton.image.sprite = Resources.Load<Sprite>("speaker") as Sprite;
-            SariskaMediaUnitySdk.NativeGenericCallHandler("offSpeaker");
+            //Do nothing for now
             isSpeakerOn = false;
         }
     }

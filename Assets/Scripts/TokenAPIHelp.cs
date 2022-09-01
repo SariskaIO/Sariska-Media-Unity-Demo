@@ -11,7 +11,7 @@ public static class TokenAPIHelp
     {
 		HttpWebRequest request;
 		string data = "{\"sessionId\":\"" + RoomName + "\"," +
-			"\"apiKey\":\"249202aabed00b41363794b526eee6927bd35cbc9bac36cd3edcaa\",\"user\":{\"name\":\"" + UserName + "\",\"moderator\": false}}";
+			"\"apiKey\":\"249202aabed00b41363794b526eee6927bd35cbc9bac36cd3edcaa\",\"user\":{\"name\":\"" + UserName + "\",\"moderator\": true}}";
 		byte[] dataBytes = Encoding.UTF8.GetBytes(data);
 		Debug.Log("Creating request");
 		request = (HttpWebRequest)(WebRequest.Create("https://api.sariska.io/api/v1/misc/generate-token"));

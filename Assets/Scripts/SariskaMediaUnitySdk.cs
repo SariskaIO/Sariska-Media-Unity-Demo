@@ -8,13 +8,11 @@ using System.Runtime.InteropServices;
 using Plugins.NumberOfUsers;
 using AOT;
 
-
 namespace Plugins.SariskaMediaUnitySdk
 {
 
     public unsafe static class SariskaMediaUnitySdk
     {
-        private static AndroidJavaObject mGLTexCtrl;
 
         private const string GAME_OBJECT_NAME = "PluginBridge";
 
@@ -38,36 +36,66 @@ namespace Plugins.SariskaMediaUnitySdk
 
         public static int remoteHeight = 0;
 
+        public static Token tokenInstance;
+
 
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void initializeSariskaMediaTransportAndStartCall(string token); //External native method
+        private static extern void initializeSariskaMediaTransport(); //External native method
 
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void onMuteAudioIos(); //External native method
+        private static extern void setupLocalStream(bool audio, bool video, int resolution); //External native method
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void onUnMuteAudioIos(); //External native method
+        private static extern void createConnection(string roomName, string token); //External native method
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void onSpeakerIos(); //External native method
+        private static extern string getDominantSpeaker(); //External native method
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void offSpeakerIos(); //External native method
+        private static extern int getParticipantCount(); //External native method
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void onLogoutIos(); //External native method
+        private static extern void lockRoom(string password); //External native method
 #if UNITY_IOS
         [DllImport("__Internal")]
 #endif
-        private static extern void onEndCallIos(); //External native method
+        private static extern void unLockRoom(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void onSwitchCamera(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void onMuteVideo(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void onUnMuteVideo(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void onMuteAudio(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void onUnMuteAudio(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void onSpeaker(); //External native method
+#if UNITY_IOS
+        [DllImport("__Internal")]
+#endif
+        private static extern void offSpeaker(); //External native method
 
         delegate void MyFuncTypeLocal(byte* byteArray, int width, int height);
 
@@ -101,12 +129,13 @@ namespace Plugins.SariskaMediaUnitySdk
             public PlatformNotSupportedException() : base() { }
         }
 
-
         static SariskaMediaUnitySdk(){
 
             gameObject = new GameObject();
 
             gameObject.name = "PluginBridge";
+
+            Debug.Log("In the static constructor");
 
             gameObject.AddComponent<NativeCallbackHandler>();
 
@@ -119,7 +148,6 @@ namespace Plugins.SariskaMediaUnitySdk
                     AndroidJavaObject currentActivityObject = androidJavaUnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
                     AndroidJavaClass androidWebViewApiClass = new AndroidJavaClass(JAVA_OBJECT_NAME);
                     androidJavaNativeCalculation = androidWebViewApiClass.CallStatic<AndroidJavaObject>("Instance", currentActivityObject);
-                    
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
@@ -132,20 +160,59 @@ namespace Plugins.SariskaMediaUnitySdk
             }
         }
 
-        // Start is called before the first frame update
-        public static void StartCall(string token, string rooomName, IntPtr localPointer, IntPtr remotePointer)
+        // Method for Initializing Sariska Media Transport SDK
+        public static void InitSariskaMediaTransport()
+        { 
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("initializeSariskaMediaTransport", 123);
+                    androidJavaNativeCalculation.Call("setupOpenGL");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    initializeSariskaMediaTransport();
+                    RegisterCallbackLocal(LocalRenderingDelegate, 1);
+                    RegisterCallbackLocal(RemoteRenderingDelegate, 0);
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        // Method for setting up local Stream 
+        public static void SetupLocalStream(bool audio, bool video, int resolution, IntPtr localPointer, IntPtr remotePointer)
         {
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    androidJavaNativeCalculation.Call("setupOpenGL", token, rooomName);
-                    androidJavaNativeCalculation.Call("setupLocalStream", remotePointer.ToInt32(), localPointer.ToInt32());
+                    androidJavaNativeCalculation.Call("setupLocalStream", audio, video, resolution, remotePointer.ToInt32(), localPointer.ToInt32());
                     break;
+
                 case RuntimePlatform.IPhonePlayer:
-                    initializeSariskaMediaTransportAndStartCall(token);
-                    RegisterCallbackLocal(LocalRenderingDelegate, 1);
-                    RegisterCallbackLocal(RemoteRenderingDelegate, 0);
+                    setupLocalStream(audio, video, resolution);
                     break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        // Method to create a connection
+        public static void CreateConnection(string roomName, string userName)
+        {
+            tokenInstance = TokenAPIHelp.GetSessionToken(roomName, userName);
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("createConnection", roomName, tokenInstance.token);
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    createConnection(roomName, tokenInstance.token);
+                    break;
+
                 default:
                     throw new PlatformNotSupportedException();
             }
@@ -194,44 +261,183 @@ namespace Plugins.SariskaMediaUnitySdk
             NumberOfUsers.NumberOfUsers.participantsList.Clear();
         }
 
+        public static void SwitchCamera()
+        {
 
-        public static void NativeGenericCallHandler(string onMethodCalled)
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    androidJavaNativeCalculation.Call("onSwitchCamera");
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    onSwitchCamera();
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+            
+        }
+
+        public static void ToggleAudio(bool isMuted)
         {
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    if(onMethodCalled == "onLogout")
+                    if (!isMuted)
                     {
-                        clearParticipantsList();
+                        androidJavaNativeCalculation.Call("onMuteAudio"); 
                     }
-                    androidJavaNativeCalculation.Call(onMethodCalled);
+                    else
+                    {
+                        androidJavaNativeCalculation.Call("onUnMuteAudio");
+                    }
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    if (!isMuted)
+                    {
+                        onMuteAudio();
+                    }
+                    else
+                    {
+                        onUnMuteAudio();
+                    }
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+            
+        }
+
+        public static void ToggleVideo(bool isVideoMuted)
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    if (!isVideoMuted)
+                    {
+                        androidJavaNativeCalculation.Call("onMuteVideo");
+                    }
+                    else
+                    {
+                        androidJavaNativeCalculation.Call("onUnMuteVideo");
+                    }
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    if (!isVideoMuted)
+                    {
+                        onMuteVideo();
+                    }
+                    else
+                    {
+                        onUnMuteVideo();
+                    }
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static void ToggleSpeaker(bool isSpeakerMuted)
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    if (!isSpeakerMuted)
+                    {
+                        androidJavaNativeCalculation.Call("onSpeaker");
+                    }
+                    else
+                    {
+                        androidJavaNativeCalculation.Call("offSpeaker");
+                    }
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    if (!isSpeakerMuted)
+                    {
+                        onSpeaker();
+                    }
+                    else
+                    {
+                        offSpeaker();
+                    }
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+        }
+
+        public static string GetDominantSpeaker()
+        {
+            string participantId = "";
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    participantId = androidJavaNativeCalculation.Call<string>("getDominantSpeaker");
                     break;
                 case RuntimePlatform.IPhonePlayer:
-                    switch (onMethodCalled)
+                    participantId = getDominantSpeaker();
+                    break;
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+            return participantId;
+        }
+
+        public static int GetParticipantCount(bool hidden)
+        {
+            int partcipantCount = 0;
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    partcipantCount = androidJavaNativeCalculation.Call<int>("getParticipantCount", hidden);
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    partcipantCount = getParticipantCount();
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+            return partcipantCount;
+        }
+
+        public static void LockUnlockRoom(bool isRoomLocked, string password)
+        {
+            
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    if (isRoomLocked)
                     {
-                        case "onMuteAudio":
-                            onMuteAudioIos();
-                            break;
-                        case "onUnMuteAudio":
-                            onUnMuteAudioIos();
-                            break;
-                        case "onSpeaker":
-                            onSpeakerIos();
-                            break;
-                        case "offSpeaker":
-                            offSpeakerIos();
-                            break;
-                        case "onLogout":
-                            onLogoutIos();
-                            break;
-                        case "onEndCall":
-                            onEndCallIos();
-                            break;
+                        androidJavaNativeCalculation.Call("unlockRoom");
+                    }
+                    else
+                    {
+                        androidJavaNativeCalculation.Call("lockRoom", password);
+                    }
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    if (isRoomLocked)
+                    {
+                        unLockRoom();
+                    }
+                    else
+                    {
+                        lockRoom(password);
                     }
                     break;
                 default:
                     throw new PlatformNotSupportedException();
-                    break;
             }
         }
     }
