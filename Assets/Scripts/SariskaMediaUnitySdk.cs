@@ -36,6 +36,10 @@ namespace Plugins.SariskaMediaUnitySdk
 
         public static int remoteHeight = 0;
 
+        public static int localWidth = 0;
+
+        public static int localHeight = 0;
+
         public static Token tokenInstance;
 
 
@@ -105,6 +109,8 @@ namespace Plugins.SariskaMediaUnitySdk
             byte[] streamByteData = new byte[width * height * 4];
             Marshal.Copy((IntPtr)byteArray, streamByteData, 0, width * height * 4);
             videoFrameDataLocal = streamByteData;
+            localHeight = height;
+            localWidth = width;
         }
 
         delegate void MyFuncTypeRemote(byte* byteArray, int width, int height);

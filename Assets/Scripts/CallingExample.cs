@@ -113,7 +113,9 @@ public class CallingExample : MonoBehaviour
         }
         else
         {
+            localTexture2D.Reinitialize(SariskaMediaUnitySdk.localWidth, SariskaMediaUnitySdk.localHeight);
             localTexture2D.LoadRawTextureData(SariskaMediaUnitySdk.videoFrameDataLocal);
+            
             localTexture2D.Apply();
         }
 
@@ -123,6 +125,7 @@ public class CallingExample : MonoBehaviour
         }
         else
         {
+            remoteTexture2D.Reinitialize(SariskaMediaUnitySdk.remoteWidth, SariskaMediaUnitySdk.remoteHeight);
             remoteTexture2D.LoadRawTextureData(SariskaMediaUnitySdk.videoFrameDataRemote);
             remoteTexture2D.Apply();
         }
