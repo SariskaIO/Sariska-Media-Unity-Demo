@@ -14,7 +14,7 @@ dependencyResolutionManagement {
             url = "https://maven.pkg.github.com/SariskaIO/maven-repository"
             credentials {
                 username = "SariskaIO"
-                password = "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"
+                password = "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"
             }
         }
     }
