@@ -11,7 +11,7 @@ public static class TokenAPIHelp
     {
 		HttpWebRequest request;
 		string data = "{\"sessionId\":\"" + RoomName + "\"," +
-			"\"apiKey\":\"249508aabecc1b532235c4e760fdad8368c642b9deb4339338ccbd\"," +
+			"\"apiKey\":\"{yout-api-key}\"," +
             "\"user\":{\"name\":\"" + UserName + "\",\"moderator\": true}}";
 		byte[] dataBytes = Encoding.UTF8.GetBytes(data);
 		Debug.Log("Creating request");
