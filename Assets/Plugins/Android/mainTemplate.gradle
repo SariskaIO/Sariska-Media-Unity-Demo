@@ -5,14 +5,14 @@
         url = "https://maven.pkg.github.com/SariskaIO/maven-repository"
         credentials {
         username = "SariskaIO"
-        password = "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"
+        password = "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"
     }
     }
         maven {
             url "https://maven.pkg.github.com/SariskaIO/maven-repository" // Assets/Plugins/Editor/iosDependencies.xml:15
 credentials {
         username = "SariskaIO"
-        password = "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"
+        password = "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"
     }
         }
     }
