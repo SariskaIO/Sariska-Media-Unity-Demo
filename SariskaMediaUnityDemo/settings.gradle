@@ -5,6 +5,18 @@ pluginManagement {
         mavenCentral()
     }
 }
+
+def getLocalProperties() {
+    Properties props = new Properties()
+    if (file("local.properties").exists()) {
+        props.load(new FileInputStream(file("local.properties")))
+}
+return props
+}
+
+
+Properties localProperties = getLocalProperties()
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -13,12 +25,13 @@ dependencyResolutionManagement {
         maven {
             url = "https://maven.pkg.github.com/SariskaIO/maven-repository"
             credentials {
-                username = "SariskaIO"
-                password = "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"
+                username = localProperties["GITHUB_USERNAME"]
+                password = localProperties["GITHUB_TOKEN"]
             }
         }
     }
 }
+
 rootProject.name = "SariskaMediaUnityDemo"
 include ':app'
 include ':SariskaMediaUnityPlugin'
