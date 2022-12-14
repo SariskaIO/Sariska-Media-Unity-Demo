@@ -14,7 +14,11 @@ The SDK is written in the Adapter pattern, which makes it extremely lightweight,
 
 For documentation, read through the link at: https://docs.sariska.io/media/development/c-unity-engine
 
-# Running the Demp APP
+# Running the Demo APP
+
+You can follow the instructions on how to run the application by following the guide.
+
+https://docs.sariska.io/setup/video-conferencing/running-sariskas-unity-demo/android
 
 1. Sign up at console.sariska.io
 
