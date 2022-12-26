@@ -24,6 +24,23 @@ namespace Plugins
         {
             androidJavaObject.Call("sendEvent", SmtEvent); // Neeed to rewrite android side
         }
+
+
+        public static AndroidJavaObject GetAndroidJavaObject()
+        {
+            if(androidJavaObject  == null)
+            {
+                Debug.Log("Android Java Object is Null");
+                return null;
+            }
+            else
+            {
+                return SariskaMediaTransport.androidJavaObject;
+            }
+        }
+
     }
+
+
 
 }

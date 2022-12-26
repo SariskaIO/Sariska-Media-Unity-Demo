@@ -213,7 +213,7 @@ namespace Plugins.SariskaMediaUnitySdk
             {
                 case RuntimePlatform.Android:
 
-                    Connection.CreateConnection(androidJavaNativeCalculation, roomName, tokenInstance.token);
+                    Connection.CreateConnection(roomName, tokenInstance.token);
 
                     Connection.AddEventListener("CONNECTION_ESTABLISHED", "Message: Connection Established");
 
@@ -253,8 +253,6 @@ namespace Plugins.SariskaMediaUnitySdk
                     return;
                 }
                 NumberOfUsers.NumberOfUsers.participantsList.Add(participantId, nameParticipant);
-                Debug.Log("Participant ID is: " + participantId);
-                Debug.Log("Participant Name is: " + nameParticipant);
                 NumberOfUsers.NumberOfUsers.userChanged = true;
             }
 
@@ -266,7 +264,6 @@ namespace Plugins.SariskaMediaUnitySdk
 
             private void HandleDominantSpeakerChanged(string participantId)
             {
-                Debug.Log("Dominant Speaker ID is: "+ participantId);
                 NumberOfUsers.NumberOfUsers.DominantSpeakerId = participantId;
                 NumberOfUsers.NumberOfUsers.userChanged = true;
             }

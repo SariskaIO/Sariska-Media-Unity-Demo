@@ -2,39 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Conference
+namespace Plugins
 {
-
-    // Join Conference
-    public static void Join()
+    public static class Conference
     {
+        private static AndroidJavaObject androidJavaObject = SariskaMediaTransport.GetAndroidJavaObject();
 
+        // Lock Conference Room
+        public static void Lock(string password)
+        {
+            androidJavaObject.Call("lockRoom", password);
+        }
+
+        // Unlock Conference Room
+        public static void Unlock()
+        {
+            androidJavaObject.Call("unlockRoom");
+        }
     }
-
-
-    // Lock Conference Room
-    public static void Lock()
-    {
-
-    }
-
-    // Unlock Conference Room
-    public static void Unlock()
-    {
-
-    }
-
-
-    // Add Event Listener to the conference 
-    public static void AddEventListener()
-    {
-
-    }
-
-    // Remove Event Listener to the conference 
-    public static void RemoteEventListener()
-    {
-
-    }
-
 }

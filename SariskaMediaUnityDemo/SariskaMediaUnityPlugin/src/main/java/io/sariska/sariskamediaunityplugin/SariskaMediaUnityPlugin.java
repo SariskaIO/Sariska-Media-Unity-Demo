@@ -17,7 +17,6 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -40,7 +39,6 @@ import io.sariska.sdk.Conference;
 import io.sariska.sdk.JitsiLocalTrack;
 import io.sariska.sdk.JitsiRemoteTrack;
 import io.sariska.sdk.SariskaMediaTransport;
-import com.unity3d.player.UnityPlayer;
 
 
 public class SariskaMediaUnityPlugin{
@@ -199,9 +197,84 @@ public class SariskaMediaUnityPlugin{
         connection.removeEventListener(event);
     }
 
+    public void addConferenceEventListener(String event){
+        switch (event){
+            case "CONFERENCE_JOINED":
+                Log.d("Android: ", "Adding Listener to Confernce : CONFERENCE_JOINED");
+                this.conference.addEventListener("CONFERENCE_JOINED", () -> {
+                    for (JitsiLocalTrack track : localTracks) {
+                        conference.addTrack(track);
+                    }
+                });
+                break;
+            case "DOMINANT_SPEAKER_CHANGED":
+                this.conference.addEventListener("DOMINANT_SPEAKER_CHANGED", p -> {
+                    String id = (String) p;
+                    conference.selectParticipant(id);
+                });
+                break;
+            case "CONFERENCE_LEFT":
+                this.conference.addEventListener("CONFERENCE_LEFT", () -> {
+                });
+                break;
 
-    private void createConference() {
+            case "TRACK_ADDED":
+                this.conference.addEventListener("TRACK_ADDED", p -> {
+                    JitsiRemoteTrack track = (JitsiRemoteTrack) p;
+                    runOnUiThread(() -> {
+                        if(track.getStreamURL().equals(localTracks.get(1).getStreamURL())){
+                            //So as to not add local track in remote container
+                            return;
+                        }
+                        if (track.getType().equals("video")) {
+                            WebRTCView view = track.render();
+                            view.setMirror(true);
+                            remoteVideoTrack = view.getVideoTrackForStreamURL(track.getStreamURL());
+                            remoteVideoTrack.addSink(new VideoSink() {
+                                @RequiresApi(api = Build.VERSION_CODES.O)
+                                @Override
+                                public void onFrame(VideoFrame videoFrame) {
+                                    RenderScript RS = RenderScript.create(context);
+                                    ScriptIntrinsicYuvToRGB yuvToRgbIntrinsic = ScriptIntrinsicYuvToRGB.create(RS, Element.U8_4(RS));
+                                    VideoFrame.I420Buffer i420Buffer = videoFrame.getBuffer().toI420();
+                                    final int width = i420Buffer.getWidth();
+                                    final int height = i420Buffer.getHeight();
+                                    byte[] nv21Data = createNV21Data(i420Buffer);
+                                    Type.Builder yuvType = new Type.Builder(RS, Element.U8(RS)).setX(nv21Data.length);
+                                    Allocation inData = Allocation.createTyped(RS, yuvType.create(), Allocation.USAGE_SCRIPT);
+                                    Type.Builder rgbaType = new Type.Builder(RS, Element.RGBA_8888(RS)).setX(width).setY(height);
+                                    Allocation outData = Allocation.createTyped(RS, rgbaType.create(), Allocation.USAGE_SCRIPT);
+                                    inData.copyFrom(nv21Data);
+                                    yuvToRgbIntrinsic.setInput(inData);
+                                    yuvToRgbIntrinsic.forEach(outData);
+                                    updateBufferRemoteStream(mRemoteTextureId, outData.getByteBuffer(), width, height);
+                                    i420Buffer.release();
+                                    System.gc();
+                                    Runtime.getRuntime().gc();
+                                }
+                            });
+                        }
+                    });
+                });
+                break;
 
+            case "TRACK_REMOVED":
+                this.conference.addEventListener("TRACK_REMOVED", p -> {
+                    JitsiRemoteTrack track = (JitsiRemoteTrack) p;
+                    runOnUiThread(() -> {
+                        remoteVideoTrack.removeSink(new VideoSink() {
+                            @Override
+                            public void onFrame(VideoFrame videoFrame) {
+                                //do nothing for now
+                            }
+                        });
+                    });
+                });
+                break;
+        }
+    }
+
+    private void createConference(){
         conference = connection.initJitsiConference();
 
         conference.addEventListener("CONFERENCE_JOINED", () -> {
@@ -270,6 +343,7 @@ public class SariskaMediaUnityPlugin{
 
         conference.join();
     }
+
 
     private byte[] createNV21Data(VideoFrame.I420Buffer i420Buffer) {
         final int width = i420Buffer.getWidth();
@@ -498,10 +572,6 @@ public class SariskaMediaUnityPlugin{
         SariskaMediaTransport.initializeSdk(mUnityActivity.getApplication());
     }
 
-
-    public void addConferenceEventListener(){
-        // To do
-    }
 
 
     public String getDominantSpeaker(){

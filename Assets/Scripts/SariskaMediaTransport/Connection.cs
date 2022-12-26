@@ -8,12 +8,11 @@ namespace Plugins
 {
     public static class Connection
     {
-        private static AndroidJavaObject androidJavaObject;
+        private static AndroidJavaObject androidJavaObject = SariskaMediaTransport.GetAndroidJavaObject();
 
         // Start a Connection
-        public static void CreateConnection(AndroidJavaObject javaObject, string roomName, string token)
+        public static void CreateConnection(string roomName, string token)
         {
-            androidJavaObject = javaObject;
             androidJavaObject.Call("createConnection", roomName, token);
         }
 
@@ -21,7 +20,6 @@ namespace Plugins
         // Add an Event Listener 
         public static void AddEventListener(string connectionEvent, string connectionMessage) 
         {
-            Debug.Log(connectionEvent);
             androidJavaObject.Call("addConnectionEventListener", connectionEvent, connectionMessage);
         }
 
