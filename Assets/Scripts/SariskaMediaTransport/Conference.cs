@@ -2,17 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Conference : MonoBehaviour
+public class Conference
 {
-    // Start is called before the first frame update
-    void Start()
+
+    // Join Conference
+    public static void Join()
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
+
+    // Lock Conference Room
+    public static void Lock()
     {
-        
+
     }
+
+    // Unlock Conference Room
+    public static void Unlock()
+    {
+
+    }
+
+
+    // Add Event Listener to the conference 
+    public static void AddEventListener()
+    {
+
+    }
+
+    // Remove Event Listener to the conference 
+    public static void RemoteEventListener()
+    {
+
+    }
+
 }

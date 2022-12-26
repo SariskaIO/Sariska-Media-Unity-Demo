@@ -17,6 +17,7 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -39,6 +40,8 @@ import io.sariska.sdk.Conference;
 import io.sariska.sdk.JitsiLocalTrack;
 import io.sariska.sdk.JitsiRemoteTrack;
 import io.sariska.sdk.SariskaMediaTransport;
+import com.unity3d.player.UnityPlayer;
+
 
 public class SariskaMediaUnityPlugin{
     private static SariskaMediaUnityPlugin _instance;
@@ -60,6 +63,7 @@ public class SariskaMediaUnityPlugin{
     private Conference conference;
     private Context context;
     private AudioManager audioManager;
+    private static final String GAME_OBJECT_NAME = "PluginBridge";
 
 
 
@@ -108,7 +112,7 @@ public class SariskaMediaUnityPlugin{
         return true;
     }
 
-    public void setupLocalStream(boolean audio, boolean video, int resolution, int mRemoteTextureId, int mLocalTextureID){
+    public void createLocalTrack(boolean audio, boolean video, int resolution, int mRemoteTextureId, int mLocalTextureID){
 
         this.mLocalTextureID = mLocalTextureID;
         this.mRemoteTextureId = mRemoteTextureId;
@@ -155,29 +159,46 @@ public class SariskaMediaUnityPlugin{
                 }
             });
         });
+    }
 
-//        connection = SariskaMediaTransport.JitsiConnection(token, roomName, false);
-//        connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
-//        connection.addEventListener("CONNECTION_FAILED", () -> {
-//        });
-//        connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
-//        });
-//        connection.connect();
+    public void sendEvent(String SmtEvent){
+
     }
 
     public void createConnection(String roomName, String tokenFromUnity){
         connection = SariskaMediaTransport.JitsiConnection(tokenFromUnity, roomName, false);
+    }
 
-        connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
+    public void addConnectionEventListener(String event, String message){
+        Log.d("There is an event", event);
+        switch (event){
+            case "CONNECTION_ESTABLISHED":
+                connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
+                break;
+            case "CONNECTION_FAILED":
+                connection.addEventListener("CONNECTION_FAILED", () -> {
+                    Log.d("Event: ", message);
+                });
+                break;
+            case "CONNECTION_DISCONNECTED":
+                connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
+                    Log.d("Event: ", message);
+                });
+        }
+    }
 
-        connection.addEventListener("CONNECTION_FAILED", () -> {
-        });
-
-        connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
-        });
-
+    public void connectToConnection(){
         connection.connect();
     }
+
+    public void disconnectConnection(){
+        connection.disconnect();
+    }
+
+    public void removeConnectionEventListener(String event){
+        connection.removeEventListener(event);
+    }
+
 
     private void createConference() {
 
@@ -246,6 +267,7 @@ public class SariskaMediaUnityPlugin{
                 });
             });
         });
+
         conference.join();
     }
 
@@ -472,13 +494,10 @@ public class SariskaMediaUnityPlugin{
         mUnityActivity.finish();
     }
 
-    public void initializeSariskaMediaTransport(int something){
+    public void initializeSariskaMediaTransport(){
         SariskaMediaTransport.initializeSdk(mUnityActivity.getApplication());
     }
 
-    public void addConnectionEventListener(){
-        // To do
-    }
 
     public void addConferenceEventListener(){
         // To do

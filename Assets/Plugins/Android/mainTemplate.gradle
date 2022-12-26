@@ -4,15 +4,15 @@
         maven{
         url = "https://maven.pkg.github.com/SariskaIO/maven-repository"
         credentials {
-        username = "{your-user-name}"
-        password = "{your-github-token}"
+        username = "dipak140"
+        password = "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"
     }
     }
         maven {
             url "https://maven.pkg.github.com/SariskaIO/maven-repository" // Assets/Plugins/Editor/iosDependencies.xml:15
 credentials {
-        username = "{your-user-name}"
-        password = "{your-github-token}"
+        username = "dipak140"
+        password = "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"
     }
         }
     }

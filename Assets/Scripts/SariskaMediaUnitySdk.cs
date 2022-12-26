@@ -212,7 +212,17 @@ namespace Plugins.SariskaMediaUnitySdk
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    Connection.connect(androidJavaNativeCalculation, roomName, tokenInstance.token);
+
+                    Connection.CreateConnection(androidJavaNativeCalculation, roomName, tokenInstance.token);
+
+                    Connection.AddEventListener("CONNECTION_ESTABLISHED", "Message: Connection Established");
+
+                    Connection.AddEventListener("CONNECTION_FAILED", "Error: Connection Failed!!");
+
+                    Connection.AddEventListener("CONNECTION_DISCONNECTED", "Message: Connection Disconnected");
+
+                    Connection.Connect();
+
                     break;
 
                 case RuntimePlatform.IPhonePlayer:

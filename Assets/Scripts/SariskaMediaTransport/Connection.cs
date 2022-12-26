@@ -8,20 +8,42 @@ namespace Plugins
 {
     public static class Connection
     {
+        private static AndroidJavaObject androidJavaObject;
 
-        public static void AddEventListener()
+        // Start a Connection
+        public static void CreateConnection(AndroidJavaObject javaObject, string roomName, string token)
         {
-
-        }
-        public static void connect(AndroidJavaObject androidJavaObject, string roomName, string token)
-        {
-            Debug.Log("Inside Connect");
-
+            androidJavaObject = javaObject;
             androidJavaObject.Call("createConnection", roomName, token);
-            System.Console.WriteLine("Inside Connect");
-
         }
 
+        // include Callback into it
+        // Add an Event Listener 
+        public static void AddEventListener(string connectionEvent, string connectionMessage) 
+        {
+            Debug.Log(connectionEvent);
+            androidJavaObject.Call("addConnectionEventListener", connectionEvent, connectionMessage);
+        }
+
+        // Remove an Event Listener 
+        public static void RemoveEventListener(string connectionEvent)
+        {
+            // To write on Java side
+            androidJavaObject.Call("removeConnectionEventListener", connectionEvent);
+        }
+
+        public static void Connect()
+        {
+            androidJavaObject.Call("connectToConnection");
+        }
+
+
+        // Disconnect for the user
+        public static void Disconnect()
+        {
+            // To write on Java side
+            androidJavaObject.Call("disconnect");
+        }
 
 
     }
