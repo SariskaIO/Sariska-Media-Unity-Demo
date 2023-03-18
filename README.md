@@ -1,13 +1,15 @@
 
 # Sariska-Media-Unity-Demo
-Demo App to run Sariska Media Services in Unity (Android and iOS)
+Demo App to run Sariska Media Services in Unity (Android and iOS), enables you to add in-game real-time communications to increase interactivity between players!
 
 # Sariska Media Unity SDK
 
 The Sariska Video SDK for Unity lets you quickly add real-time communication to your Unity script. The SDK includes the following features to create seamless unity applications for Android and iOS.
 
-**Platforms**: Android and iOS
+**Platforms**: Sariska's Unity SDK currently supports Android and iOS, there is a separate implementation if you are looking for video calls for WebGL using Unity. The link to that repo can be found here: https://github.com/SariskaIO/sariska-media-unity-webgl
+
 **Real-time communication**: Bring audio and video communication to your users at ultra-low latency.
+
 **Open Source**: Based on the extremely popular Jitsi Architecture, bring the power and constant innovation of open source into your project.
 
 The SDK is written in the Adapter pattern, which makes it extremely lightweight, with reusable code written in languages native to the platform, it lets developers have enormous flexibility on what features to cherry-pick.
