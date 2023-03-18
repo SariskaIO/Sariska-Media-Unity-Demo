@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Runtime.InteropServices;
 using Plugins.NumberOfUsers;
 using AOT;
+using Plugins;
 
 namespace Plugins.SariskaMediaUnitySdk
 {
@@ -167,13 +168,12 @@ namespace Plugins.SariskaMediaUnitySdk
         }
 
         // Method for Initializing Sariska Media Transport SDK
-        public static void InitSariskaMediaTransport()
+        public static void InitializeSdk()
         { 
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    androidJavaNativeCalculation.Call("initializeSariskaMediaTransport", 123);
-                    androidJavaNativeCalculation.Call("setupOpenGL");
+                    SariskaMediaTransport.InitializeSdk(androidJavaNativeCalculation);
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
@@ -188,12 +188,12 @@ namespace Plugins.SariskaMediaUnitySdk
         }
 
         // Method for setting up local Stream 
-        public static void SetupLocalStream(bool audio, bool video, int resolution, IntPtr localPointer, IntPtr remotePointer)
+        public static void CreateLocalTrack(bool audio, bool video, int resolution, IntPtr localPointer, IntPtr remotePointer)
         {
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    androidJavaNativeCalculation.Call("setupLocalStream", audio, video, resolution, remotePointer.ToInt32(), localPointer.ToInt32());
+                    SariskaMediaTransport.CreateLocalTrack(audio, video, resolution, remotePointer, localPointer);
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
@@ -212,7 +212,17 @@ namespace Plugins.SariskaMediaUnitySdk
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
-                    androidJavaNativeCalculation.Call("createConnection", roomName, tokenInstance.token);
+
+                    Connection.CreateConnection(roomName, tokenInstance.token);
+
+                    Connection.AddEventListener("CONNECTION_ESTABLISHED", "Message: Connection Established");
+
+                    Connection.AddEventListener("CONNECTION_FAILED", "Error: Connection Failed!!");
+
+                    Connection.AddEventListener("CONNECTION_DISCONNECTED", "Message: Connection Disconnected");
+
+                    Connection.Connect();
+
                     break;
 
                 case RuntimePlatform.IPhonePlayer:
@@ -243,8 +253,6 @@ namespace Plugins.SariskaMediaUnitySdk
                     return;
                 }
                 NumberOfUsers.NumberOfUsers.participantsList.Add(participantId, nameParticipant);
-                Debug.Log("Participant ID is: " + participantId);
-                Debug.Log("Participant Name is: " + nameParticipant);
                 NumberOfUsers.NumberOfUsers.userChanged = true;
             }
 
@@ -256,7 +264,6 @@ namespace Plugins.SariskaMediaUnitySdk
 
             private void HandleDominantSpeakerChanged(string participantId)
             {
-                Debug.Log("Dominant Speaker ID is: "+ participantId);
                 NumberOfUsers.NumberOfUsers.DominantSpeakerId = participantId;
                 NumberOfUsers.NumberOfUsers.userChanged = true;
             }

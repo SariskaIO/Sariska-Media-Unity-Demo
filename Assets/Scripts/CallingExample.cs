@@ -91,9 +91,9 @@ public class CallingExample : MonoBehaviour
         {
             //Calling SDK from here
 
-            SariskaMediaUnitySdk.InitSariskaMediaTransport();
+            SariskaMediaUnitySdk.InitializeSdk();
 
-            SariskaMediaUnitySdk.SetupLocalStream(true, true, 180, localTexturePointer, remoteTexturePointer);
+            SariskaMediaUnitySdk.CreateLocalTrack(true, true, 180, localTexturePointer, remoteTexturePointer);
 
             SariskaMediaUnitySdk.CreateConnection(roomName, userName);
         }

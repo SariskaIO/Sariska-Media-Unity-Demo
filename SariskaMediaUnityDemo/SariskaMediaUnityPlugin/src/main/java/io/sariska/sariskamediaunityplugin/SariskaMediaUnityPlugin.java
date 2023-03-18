@@ -40,6 +40,7 @@ import io.sariska.sdk.JitsiLocalTrack;
 import io.sariska.sdk.JitsiRemoteTrack;
 import io.sariska.sdk.SariskaMediaTransport;
 
+
 public class SariskaMediaUnityPlugin{
     private static SariskaMediaUnityPlugin _instance;
     private Activity mUnityActivity;
@@ -60,6 +61,7 @@ public class SariskaMediaUnityPlugin{
     private Conference conference;
     private Context context;
     private AudioManager audioManager;
+    private static final String GAME_OBJECT_NAME = "PluginBridge";
 
 
 
@@ -108,7 +110,7 @@ public class SariskaMediaUnityPlugin{
         return true;
     }
 
-    public void setupLocalStream(boolean audio, boolean video, int resolution, int mRemoteTextureId, int mLocalTextureID){
+    public void createLocalTrack(boolean audio, boolean video, int resolution, int mRemoteTextureId, int mLocalTextureID){
 
         this.mLocalTextureID = mLocalTextureID;
         this.mRemoteTextureId = mRemoteTextureId;
@@ -155,32 +157,124 @@ public class SariskaMediaUnityPlugin{
                 }
             });
         });
+    }
 
-//        connection = SariskaMediaTransport.JitsiConnection(token, roomName, false);
-//        connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
-//        connection.addEventListener("CONNECTION_FAILED", () -> {
-//        });
-//        connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
-//        });
-//        connection.connect();
+    public void sendEvent(String SmtEvent){
+
     }
 
     public void createConnection(String roomName, String tokenFromUnity){
         connection = SariskaMediaTransport.JitsiConnection(tokenFromUnity, roomName, false);
+    }
 
-        connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
+    public void addConnectionEventListener(String event, String message){
+        Log.d("There is an event", event);
+        switch (event){
+            case "CONNECTION_ESTABLISHED":
+                connection.addEventListener("CONNECTION_ESTABLISHED", this::createConference);
+                break;
+            case "CONNECTION_FAILED":
+                connection.addEventListener("CONNECTION_FAILED", () -> {
+                    Log.d("Event: ", message);
+                });
+                break;
+            case "CONNECTION_DISCONNECTED":
+                connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
+                    Log.d("Event: ", message);
+                });
+        }
+    }
 
-        connection.addEventListener("CONNECTION_FAILED", () -> {
-        });
-
-        connection.addEventListener("CONNECTION_DISCONNECTED", () -> {
-        });
-
+    public void connectToConnection(){
         connection.connect();
     }
 
-    private void createConference() {
+    public void disconnectConnection(){
+        connection.disconnect();
+    }
 
+    public void removeConnectionEventListener(String event){
+        connection.removeEventListener(event);
+    }
+
+    public void addConferenceEventListener(String event){
+        switch (event){
+            case "CONFERENCE_JOINED":
+                Log.d("Android: ", "Adding Listener to Confernce : CONFERENCE_JOINED");
+                this.conference.addEventListener("CONFERENCE_JOINED", () -> {
+                    for (JitsiLocalTrack track : localTracks) {
+                        conference.addTrack(track);
+                    }
+                });
+                break;
+            case "DOMINANT_SPEAKER_CHANGED":
+                this.conference.addEventListener("DOMINANT_SPEAKER_CHANGED", p -> {
+                    String id = (String) p;
+                    conference.selectParticipant(id);
+                });
+                break;
+            case "CONFERENCE_LEFT":
+                this.conference.addEventListener("CONFERENCE_LEFT", () -> {
+                });
+                break;
+
+            case "TRACK_ADDED":
+                this.conference.addEventListener("TRACK_ADDED", p -> {
+                    JitsiRemoteTrack track = (JitsiRemoteTrack) p;
+                    runOnUiThread(() -> {
+                        if(track.getStreamURL().equals(localTracks.get(1).getStreamURL())){
+                            //So as to not add local track in remote container
+                            return;
+                        }
+                        if (track.getType().equals("video")) {
+                            WebRTCView view = track.render();
+                            view.setMirror(true);
+                            remoteVideoTrack = view.getVideoTrackForStreamURL(track.getStreamURL());
+                            remoteVideoTrack.addSink(new VideoSink() {
+                                @RequiresApi(api = Build.VERSION_CODES.O)
+                                @Override
+                                public void onFrame(VideoFrame videoFrame) {
+                                    RenderScript RS = RenderScript.create(context);
+                                    ScriptIntrinsicYuvToRGB yuvToRgbIntrinsic = ScriptIntrinsicYuvToRGB.create(RS, Element.U8_4(RS));
+                                    VideoFrame.I420Buffer i420Buffer = videoFrame.getBuffer().toI420();
+                                    final int width = i420Buffer.getWidth();
+                                    final int height = i420Buffer.getHeight();
+                                    byte[] nv21Data = createNV21Data(i420Buffer);
+                                    Type.Builder yuvType = new Type.Builder(RS, Element.U8(RS)).setX(nv21Data.length);
+                                    Allocation inData = Allocation.createTyped(RS, yuvType.create(), Allocation.USAGE_SCRIPT);
+                                    Type.Builder rgbaType = new Type.Builder(RS, Element.RGBA_8888(RS)).setX(width).setY(height);
+                                    Allocation outData = Allocation.createTyped(RS, rgbaType.create(), Allocation.USAGE_SCRIPT);
+                                    inData.copyFrom(nv21Data);
+                                    yuvToRgbIntrinsic.setInput(inData);
+                                    yuvToRgbIntrinsic.forEach(outData);
+                                    updateBufferRemoteStream(mRemoteTextureId, outData.getByteBuffer(), width, height);
+                                    i420Buffer.release();
+                                    System.gc();
+                                    Runtime.getRuntime().gc();
+                                }
+                            });
+                        }
+                    });
+                });
+                break;
+
+            case "TRACK_REMOVED":
+                this.conference.addEventListener("TRACK_REMOVED", p -> {
+                    JitsiRemoteTrack track = (JitsiRemoteTrack) p;
+                    runOnUiThread(() -> {
+                        remoteVideoTrack.removeSink(new VideoSink() {
+                            @Override
+                            public void onFrame(VideoFrame videoFrame) {
+                                //do nothing for now
+                            }
+                        });
+                    });
+                });
+                break;
+        }
+    }
+
+    private void createConference(){
         conference = connection.initJitsiConference();
 
         conference.addEventListener("CONFERENCE_JOINED", () -> {
@@ -246,8 +340,10 @@ public class SariskaMediaUnityPlugin{
                 });
             });
         });
+
         conference.join();
     }
+
 
     private byte[] createNV21Data(VideoFrame.I420Buffer i420Buffer) {
         final int width = i420Buffer.getWidth();
@@ -472,17 +568,10 @@ public class SariskaMediaUnityPlugin{
         mUnityActivity.finish();
     }
 
-    public void initializeSariskaMediaTransport(int something){
+    public void initializeSariskaMediaTransport(){
         SariskaMediaTransport.initializeSdk(mUnityActivity.getApplication());
     }
 
-    public void addConnectionEventListener(){
-        // To do
-    }
-
-    public void addConferenceEventListener(){
-        // To do
-    }
 
 
     public String getDominantSpeaker(){

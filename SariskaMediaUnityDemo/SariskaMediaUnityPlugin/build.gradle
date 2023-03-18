@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-
+    compileOnly files('/Applications/Unity/Hub/Editor/2021.2.18f1/PlaybackEngines/AndroidPlayer/Variations/mono/Release/Classes/classes.jar')
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
     testImplementation 'junit:junit:4.13.2'
